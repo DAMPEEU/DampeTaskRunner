@@ -1,0 +1,38 @@
+daemon:
+ pidfile: /tmp/proc/DampeTaskRunner.pid
+ logfile: /tmp/log/DampeTaskRunner.log
+ loglevel: INFO
+ sleeptime: 300.
+ cycles:    200
+
+software:
+ externals_path: "/atlas/software/dampe/setup/setup-externals.sh"
+ install_path:   "/atlas/software/dampe/releases/DmpSoftware-5-3-1"
+ launcher:       "/atlas/software/dampe/scripts/DampeJobLauncher_v2.sh"
+ env_vars:
+  DAMPE_LOGLEVEL : "ERROR"
+
+batch:
+ queue: medium
+ mem: 6000mb
+ max_jobs: 200
+ user: zimmer
+
+storage:
+ type:    xrootd
+ server: "grid05.unige.ch"
+ port: 1094
+ basedir: "/dpm/unige.ch/home/dampe"
+
+tasks:
+ reprocess:
+  command: "python /dampe/data3/mc/JobOption_MC_DigiReco_Prod.py"
+  workdir: "/dampe/data3/mc/runner/"
+  input_root:  "@XROOTD:BASEDIR/mc/simu"
+  output_root: ["@XROOTD:BASEDIR/mc/reco"]
+  #,"/dampe/data3/mc/output/dpm/unige.ch/home/dampe/mc/reco"]
+  verify_output: True
+  pattern: "*v5r3*"
+  max_files_per_job : 500
+  # this is important to help the runner to know how to change names.
+  type: "simu:reco"

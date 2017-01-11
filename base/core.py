@@ -65,7 +65,7 @@ class Runner(object):
     def sleep(self):
         """ sleep for some time """
         st = self.daemon.get("sleeptime",300)
-        self.log.info("cycle completed, will sleep for %s"st)
+        self.log.info("cycle completed, will sleep for %s",st)
         sleep(st)
 
     def cleanup(self):

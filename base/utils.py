@@ -37,10 +37,8 @@ def mkdir(Dir):
 def isfile(mpath,**kwargs):
     """ returns if file is present, and wraps xrootd protocol"""
     if mpath.startswith("root:"):
-        assert 'server' in kwargs, 'must provide server to go with'
-        server = kwargs.get("server","localhost")
-        if server == 'localhost': raise RuntimeError("found server localhost, expect remote")
-        lfn = mpath.replace("{server}/".format(server=server),"")
+        server = mpath.split("/")[2]
+        lfn = mpath.replace("root://{server}/".format(server=server),"")
         rc = client.FileSystem(server)
         is_ok, res = rc.stat(lfn)
         if not is_ok.ok:

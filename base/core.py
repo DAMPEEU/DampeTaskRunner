@@ -128,7 +128,7 @@ class RecoRunner(Runner):
             lfn = infile
             server = ""
             if infile.startswith("root://"):
-                server = "root://{server}/".format(server=lfn.split("/")[2])
+                server = "root://{server}".format(server=lfn.split("/")[2])
                 lfn = lfn.replace(server,"")
             lfn_in = lfn
             outfile = deepcopy(lfn_in)
@@ -149,10 +149,13 @@ class RecoRunner(Runner):
 
         for f in self.files_to_process:
             infile = f
+
             bad_file = False
             target = 'local'
             while len(base_dirs):
                 base_dir = base_dirs[0]
+                self.log.debug("using basedir: %s",base_dir)
+                target = 'local'
                 if "@XROOTD:BASEDIR" in base_dir:
                     base_dir = base_dir.replace("@XROOTD:BASEDIR", self.__get_xrd_base__())
                     target = 'xrootd'

@@ -7,12 +7,13 @@ import logging
 from tqdm import tqdm
 from fnmatch import fnmatch
 from glob import glob
-from os import environ, remove
+from shutil import rmtree
+from os import environ, remove, chdir
 from os.path import abspath, isdir, join as opjoin
 from copy import deepcopy
 from yaml import load as yload
 from tempfile import NamedTemporaryFile
-from base.utils import sleep, abstractmethod, verifyDampeMC, isfile, get_chunks, run
+from base.utils import sleep, abstractmethod, verifyDampeMC, mkdir, isfile, get_chunks, run
 from base.batch import submit, queryJobs
 from XRootD import client
 
@@ -72,8 +73,9 @@ class Runner(object):
     def cleanup(self):
         """ clean-up procedure """
         for f in self.files_to_clean:
+            self.log.debug("cleanup: remove %s",f)
             remove(f)
-        pass
+
 
     def execute(self):
         """ this one executes stuff """
@@ -198,9 +200,10 @@ class RecoRunner(Runner):
     def initCycle(self):
         """ initialize each cycle """
         wd = self.task.get("workdir","/tmp/runner")
-        if not isdir(wd):
-            mkdir(wd)
-
+        if isdir(wd):
+            rmtree(wd)
+        mkdir(wd)
+        chdir(wd)
         # need to fill files_to_process
         def lfn(parent,child,xc=None):
             if xc is None: return ""

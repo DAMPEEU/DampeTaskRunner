@@ -168,15 +168,16 @@ class RecoRunner(Runner):
 
         # next, split list into chunks.
         nchunks = self.task.get("max_jobs",10) - len(self.jobs.keys())
-        maxfiles = self.task.get("max_files_per_job",10)*nchunks
+        nfiles  = self.task.get("max_files_per_job",10)
+        maxfiles = nfiles * nchunks
         queue = self.batch.get("queue","short")
         if len(infiles) >= maxfiles:
             infiles = infiles[0:maxfiles-1]
             outfiles= outfiles[0:maxfiles-1]
 
         # evenly split chunks.
-        in_chunks = get_chunks(infiles,nchunks)
-        out_chunks= get_chunks(outfiles,nchunks)
+        in_chunks = get_chunks(infiles,nfiles)
+        out_chunks= get_chunks(outfiles,nfiles)
 
         for i in tqdm(range(nchunks)):
             chunk = dict(zip(in_chunks[i],out_chunks[i]))

@@ -30,6 +30,8 @@ class Runner(object):
         self.files_to_clean = []
         self.good = False
         self.launcher = None
+        self.cycle = 0
+        self.cycles= -1
         self.daemon = {}
         self.software={}
         self.batch = {}

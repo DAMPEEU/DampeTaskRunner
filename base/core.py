@@ -246,7 +246,7 @@ class RecoRunner(Runner):
                     files_to_add = []
                     for entry in folders.dirlist:
                         self.log.debug(str(entry))
-                        lfn_name = lfn(folders.parent, entry.name)
+                        lfn_name = lfn(folders.parent, entry.name, xc=xc)
                         self.log.debug(lfn_name)
                         if fnmatch(lfn_name,"*.root"): files_to_add.append(lfn_name)
                     self.log.info("adding %i files to processing list",len(files_to_add))

@@ -149,10 +149,9 @@ class RecoRunner(Runner):
 
         for f in self.files_to_process:
             infile = f
-            bd = deepcopy(base_dirs)
-            while len(bd):
-                #print base_dirs
-                base_dir = bd[0]
+            skip = False
+            for base_dir in base_dirs:
+                base_dir
                 self.log.debug("using basedir: %s",base_dir)
                 target = 'local'
                 if "@XROOTD:BASEDIR" in base_dir:
@@ -170,13 +169,16 @@ class RecoRunner(Runner):
                     if verify:
                         if verifyDampeMC(outfile):
                             self.log.info("verification of ROOT file successful, skipping")
-                            continue
+                            skip = True
+                            break
                         else:
                             self.log.info("verification of ROOT file failed")
-                            bd.pop(0) # remove the first element
+                            continue # move on to 2nd method.
                     else:
                         self.log.info("skipping verification, skipping file.")
-                        continue
+                        skip = True
+                        break
+            if skip: continue
             # file not being present, should process
             self.log.debug("FILE: %s -> %s", infile, outfile)
             if len(files) >= maxfiles: break

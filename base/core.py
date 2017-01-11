@@ -105,6 +105,14 @@ class RecoRunner(Runner):
     storage_type = 'local'
     jobs = {}
 
+    def __get_xrd_base__(self):
+        kret = ""
+        if self.storage_type == 'xrootd':
+            kret = "root://{server}:{port}/{base_dir}".format(server=self.storage.get("server", "localhost"),
+                                                              port=int(self.storage.get("port", "1094")),
+                                                              base_dir=self.storage.get("basedir", "/tmp"))
+        return kret
+
     def runCycle(self):
         """ run in each cycle """
         wd = self.task.get("workdir", "/tmp/runner")
@@ -115,13 +123,6 @@ class RecoRunner(Runner):
         maxfiles = nfiles * nchunks
         self.log.debug("#chunks %i | #files %i | #total files %i",nchunks, nfiles, maxfiles)
 
-        def get_xrd_base(   ):
-            kret = ""
-            if self.storage_type == 'xrootd':
-                kret = "root://{server}:{port}/{base_dir}".format(server=self.storage.get("server", "localhost"),
-                                                                  port=int(self.storage.get("port", "1094")),
-                                                                  base_dir=self.storage.get("basedir", "/tmp"))
-            return kret
 
         def infile2outfile(infile,base_dir,method='simu:reco'):
             print infile
@@ -137,7 +138,7 @@ class RecoRunner(Runner):
         files = []
         verify = self.task.get("verify_output",False)
         self.log.info("Requested verification of input files prior to submitting jobs")
-        base_dirs = self.storage.get("output_root",["/tmp"])
+        base_dirs = self.task.get("output_root",["/tmp"])
 
         for f in self.files_to_process:
             infile = f
@@ -145,7 +146,7 @@ class RecoRunner(Runner):
             while len(base_dirs):
                 base_dir = base_dirs[0]
                 if "@XROOTD:BASEDIR" in base_dir:
-                    base_dir = base_dir.replace("@XROOTD:BASEDIR", get_xrd_base())
+                    base_dir = base_dir.replace("@XROOTD:BASEDIR", self.__get_xrd_base__())
                 outfile = infile2outfile(infile,base_dir)
                 print outfile
                 if isfile(outfile):

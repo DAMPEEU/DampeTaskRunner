@@ -45,7 +45,7 @@ def main(argv=None):
     cfg = parse_config(args.cfg)
 
     logfile = cfg["daemon"].get("logfile","/tmp/test.log")
-    loglevel= cfg["daemon"].get("loglevel","INFO")
+    loglevel= cfg["daemon"].get("loglevel","DEBUG")
     pidfile = cfg['daemon'].get("pidfile", "/tmp/runner.pid")
     if not isdir(dirname(pidfile)): mkdir(dirname(pidfile))
     if not isdir(dirname(logfile)): mkdir(dirname(logfile))

@@ -223,13 +223,16 @@ class RecoRunner(Runner):
             files_to_process = [abspath(f) for f in glob("{base}/{pattern}/*.root".format(base=base_dir,pattern=pattern))]
         else:
             self.log.info("processing remote files")
-            xc = client.FileSystem("root://{server}:{port}".format(server=self.storage.get("server","localhost"),
-                                                                   port=int(self.storage.get("port",8000))))
-
-            base_dir = base_dir.replace("@XROOTD:BASEDIR","")
+            server = "root://{server}:{port}".format(server=self.storage.get("server","localhost"),
+                                                                   port=int(self.storage.get("port",8000)))
+            xc = client.FileSystem(server)
+            self.log.debug("REMOTE server: %s",server)
+            base_dir = base_dir.replace("@XROOTD:BASEDIR",self.storage.get("basedir",""))
+            self.log.debug("REMOTE base dir: %s",base_dir)
             is_ok, folders = xc.dirlist(base_dir)
             if not is_ok.ok:
                 self.log.error(is_ok.message)
+                return
             else:
                 tasks = [opjoin(folders.parent,entry.name) for entry in folders.dirlist if fnmatch(entry.name,pattern)]
                 self.log.info("found %i tasks",len(tasks))

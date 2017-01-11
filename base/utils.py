@@ -7,7 +7,7 @@ from subprocess import PIPE, Popen
 
 # add XRootD python bindings: http://xrootd.org/doc/python/xrootd-python/index.html
 from XRootD import client
-from XrootD.client.flags import OpenFlags, MkDirFlags, AccessMode
+from XRootD.client.flags import OpenFlags, MkDirFlags, AccessMode
 
 # suppress ROOT warnings.
 from ROOT import gROOT, TChain

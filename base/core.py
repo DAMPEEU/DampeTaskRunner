@@ -54,7 +54,7 @@ class Runner(object):
         self.launcher = self.software.get("launcher",None)
         environ["DAMPE_PREREQUISITE_SCRIPT"]=self.software.get("externals_path","/tmp")
         environ["DAMPME_INSTALL_PATH"]=self.software.get("install_path","/tmp")
-        for key,value in self.software.get("env_vars",{}):
+        for key,value in self.software.get("env_vars",{}).iteritems():
             environ[key]=value
 
     @abstractmethod

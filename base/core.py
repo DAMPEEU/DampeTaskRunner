@@ -195,12 +195,12 @@ class RecoRunner(Runner):
                   "-l vmem=6000mb {launcher}".format(launcher=self.launcher, queue=queue)
             self.log.info("submitting chunk %i: %s",i, cmd)
             jobId = -1
-            try:
-                jobId = submit(cmd)
-            except Exception as err:
-                self.log.error(str(err))
-                continue
-            self.jobs[jobId]="Q"
+            #try:
+            #    jobId = submit(cmd)
+            #except Exception as err:
+            #    self.log.error(str(err))
+            #    continue
+            #self.jobs[jobId]="Q"
             self.files_to_clean.append(abspath(tf.name))
 
     def initCycle(self):

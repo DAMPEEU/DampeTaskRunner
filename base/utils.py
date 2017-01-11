@@ -2,7 +2,7 @@ import logging
 from time import sleep as time_sleep
 from psutil import AccessDenied, Process as psutil_proc
 from os import makedirs, utime
-from os.path import isfile, isdir
+from os.path import isfile as op_isfile, isdir
 from subprocess import PIPE, Popen
 
 # add XRootD python bindings: http://xrootd.org/doc/python/xrootd-python/index.html
@@ -55,7 +55,7 @@ def isfile(mpath,**kwargs):
         else:
             return True
     else:
-        return isfile(mpath)
+        return op_isfile(mpath)
 
 
 

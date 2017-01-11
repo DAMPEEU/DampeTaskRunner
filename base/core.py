@@ -151,7 +151,6 @@ class RecoRunner(Runner):
             infile = f
 
             bad_file = False
-            target = 'local'
             while len(base_dirs):
                 print base_dirs
                 base_dir = base_dirs[0]
@@ -162,7 +161,7 @@ class RecoRunner(Runner):
                     target = 'xrootd'
                 outfile = infile2outfile(infile,target=target)
                 print outfile
-                if target != 'xrootd':
+                if target == 'local':
                     outfile = opjoin(base_dir,outfile)
                 print outfile
                 if isfile(outfile):

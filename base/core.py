@@ -171,11 +171,14 @@ class RecoRunner(Runner):
                     self.jobs[job]=status
 
         # next, split list into chunks.
+        self.log.info("**DBG**: %s",str(self.batch))
         nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
         nfiles  = self.task.get("max_files_per_job",10)
         maxfiles = nfiles * nchunks
+        self.log.debug("#chunks %i | #files %i | #total files %i",nchunks, nfiles, maxfiles)
+
         queue = self.batch.get("queue","short")
-        memory= self.batch.get("memory","100Mb")
+        memory= self.batch.get("mem","100Mb")
         if len(infiles) >= maxfiles:
             infiles = infiles[0:maxfiles-1]
             outfiles= outfiles[0:maxfiles-1]

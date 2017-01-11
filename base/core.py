@@ -150,6 +150,7 @@ class RecoRunner(Runner):
         for f in self.files_to_process:
             infile = f
             skip = False
+            outfilesF = []
             for base_dir in base_dirs:
                 base_dir
                 self.log.debug("using basedir: %s",base_dir)
@@ -163,6 +164,7 @@ class RecoRunner(Runner):
                     outfile = "".join([base_dir,outfile])
                     while "//" in outfile:
                         outfile = outfile.replace("//","/")
+                outfilesF.append(outfile)
                 #print outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)
@@ -180,9 +182,9 @@ class RecoRunner(Runner):
                         break
             if skip: continue
             # file not being present, should process
-            self.log.debug("FILE: %s -> %s", infile, outfile)
+            self.log.debug("FILE: %s -> %s", infile, outfilesF[0])
             if len(files) >= maxfiles: break
-            files.append((infile, outfile))
+            files.append((infile, outfilesF[0]))
 
         # query the job status
         jobs_in_batch = {}

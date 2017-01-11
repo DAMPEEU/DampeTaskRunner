@@ -150,7 +150,7 @@ class RecoRunner(Runner):
         for f in self.files_to_process:
             infile = f
             bd = deepcopy(base_dirs)
-            if len(bd) > 0:
+            while len(bd):
                 #print base_dirs
                 base_dir = bd[0]
                 self.log.debug("using basedir: %s",base_dir)

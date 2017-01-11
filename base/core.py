@@ -171,6 +171,9 @@ class RecoRunner(Runner):
                 else:
                     self.jobs[job]=status
 
+        self.log.critical(infiles)
+        self.log.critical(outfiles)
+
         # next, split list into chunks.
         self.log.critical("**DBG**: %s",str(self.batch))
         nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())

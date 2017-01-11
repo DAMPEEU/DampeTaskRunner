@@ -183,6 +183,7 @@ class RecoRunner(Runner):
         if len(infiles) >= maxfiles:
             infiles = infiles[0:maxfiles-1]
             outfiles= outfiles[0:maxfiles-1]
+        arr = array([infiles,outfiles])
         chunks = array_split(arr.T,nchunks)
 
         for i,chunk in tqdm(enumerate(chunks)):

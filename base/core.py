@@ -139,7 +139,7 @@ class RecoRunner(Runner):
                 outfile = (outfile.replace(".mc.root",".reco.root")).replace("mc/simu","mc/reco")
             lfn_out= outfile
             if target == 'xrootd':
-                return "{server}/{lfn}".format(server=server,lfn=lfn_out)
+                return "{server}{lfn}".format(server=server,lfn=lfn_out)
             return lfn_out
 
         files = []
@@ -153,6 +153,7 @@ class RecoRunner(Runner):
             bad_file = False
             target = 'local'
             while len(base_dirs):
+                print base_dirs
                 base_dir = base_dirs[0]
                 self.log.debug("using basedir: %s",base_dir)
                 target = 'local'

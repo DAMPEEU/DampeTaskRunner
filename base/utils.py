@@ -21,22 +21,6 @@ def mkdir(Dir):
         if not isdir(Dir):
             makedirs(Dir)
 
-def run(cmd):
-    """
-    :param cmd: command string to execute
-    :return: return code, stderr, stdout
-    """
-    tsk = Popen(cmd.split(), stdout=PIPE, stderr=PIPE)
-    rc = tsk.wait()
-    output = tsk.stdout.read()
-    error = tsk.stderr.read()
-    if rc:
-        raise Exception("error, RC=%i, error msg follows \n %s" % (rc, error))
-    return rc, output, error
-
-def get_chunks(MyList, n):
-  return [MyList[x:x+n] for x in range(0, len(MyList), n)]
-
 def isfile(mpath,**kwargs):
     """ returns if file is present, and wraps xrootd protocol"""
     if mpath.startswith("root:"):
@@ -56,6 +40,24 @@ def isfile(mpath,**kwargs):
             return True
     else:
         return isfile(mpath)
+
+def run(cmd):
+    """
+    :param cmd: command string to execute
+    :return: return code, stderr, stdout
+    """
+    tsk = Popen(cmd.split(), stdout=PIPE, stderr=PIPE)
+    rc = tsk.wait()
+    output = tsk.stdout.read()
+    error = tsk.stderr.read()
+    if rc:
+        raise Exception("error, RC=%i, error msg follows \n %s" % (rc, error))
+    return rc, output, error
+
+def get_chunks(MyList, n):
+  return [MyList[x:x+n] for x in range(0, len(MyList), n)]
+
+
 
 
 def verifyDampeMC(self,fn, ftype = 'reco'):

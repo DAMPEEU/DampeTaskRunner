@@ -162,7 +162,7 @@ class RecoRunner(Runner):
                 outfile = infile2outfile(infile,target=target)
                 print outfile
                 if target == 'local':
-                    outfile = opjoin(base_dir,outfile)
+                    outfile = "".join(base_dir,outfile)
                 print outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)

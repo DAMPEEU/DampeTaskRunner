@@ -10,9 +10,10 @@ scripts.runner -- main script to execute DampeTaskRunner
 
 import sys
 from os import remove
+from os.path import isdir, dirname
 from argparse import ArgumentParser
 from base.core import RecoRunner, parse_config
-from base.utils import ProcessResourceMonitor, sleep, touch, isfile
+from base.utils import ProcessResourceMonitor, sleep, touch, isfile, mkdir
 from multiprocessing import Process
 from psutil import Process as PsProcess
 import logging
@@ -46,6 +47,8 @@ def main(argv=None):
     logfile = cfg["global"].get("logfile","/tmp/test.log")
     loglevel= cfg["global"].get("loglevel","INFO")
     pidfile = cfg['global'].get("pidfile", "/tmp/runner.pid")
+    if not isdir(dirname(pidfile)): mkdir(dirname(pidfile))
+    if not isdir(dirname(logfile)): mkdir(dirname(logfile))
     touch(pidfile)
 
     parent = child = "DEBUG"

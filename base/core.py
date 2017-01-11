@@ -150,9 +150,8 @@ class RecoRunner(Runner):
         for f in self.files_to_process:
             infile = f
 
-            bad_file = False
-            while len(base_dirs):
-                print base_dirs
+            if len(base_dirs):
+                #print base_dirs
                 base_dir = base_dirs[0]
                 self.log.debug("using basedir: %s",base_dir)
                 target = 'local'
@@ -160,27 +159,28 @@ class RecoRunner(Runner):
                     base_dir = base_dir.replace("@XROOTD:BASEDIR", self.__get_xrd_base__())
                     target = 'xrootd'
                 outfile = infile2outfile(infile,target=target)
-                print outfile
+                #print outfile
                 if target == 'local':
                     outfile = "".join([base_dir,outfile])
-                print outfile
+                    while "//" in outfile:
+                        outfile = outfile("//","/")
+                #print outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)
                     if verify:
                         if verifyDampeMC(outfile):
                             self.log.info("verification of ROOT file successful, skipping")
+                            continue
                         else:
-                            self.log.warning("verification of ROOT file failed")
-                            bad_file = True
-                else:
-                    bad_file = True
-                if bad_file:
-                    base_dirs.pop(0) # remove the first element
-            if bad_file:
-                continue
-            self.log.debug("FILE: %s -> %s",infile, outfile)
+                            self.log.info("verification of ROOT file failed")
+                            base_dirs.pop(0) # remove the first element
+                    else:
+                        self.log.info("skipping verification, skipping file.")
+                        continue
+            # file not being present, should process
+            self.log.debug("FILE: %s -> %s", infile, outfile)
             if len(files) >= maxfiles: break
-            files.append((infile,outfile))
+            files.append((infile, outfile))
 
         # query the job status
         jobs_in_batch = {}

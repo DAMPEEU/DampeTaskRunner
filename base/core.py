@@ -89,7 +89,7 @@ class Runner(object):
             self.initCycle()
             self.runCycle()
             self.sleep()
-            self.cyle += 1
+            self.cycle += 1
         self.log.info("reached last cycle, start cleaning procedure")
         self.cleanup()
         # reached last cycle
@@ -106,6 +106,8 @@ class RecoRunner(Runner):
 
     def runCycle(self):
         """ run in each cycle """
+        wd = self.task.get("workdir", "/tmp/runner")
+        chdir(wd)
 
         def get_xrd_base(   ):
             kret = ""
@@ -181,7 +183,7 @@ class RecoRunner(Runner):
 
         for i in tqdm(range(nchunks)):
             chunk = dict(zip(in_chunks[i],out_chunks[i]))
-            tf = NamedTemporaryFile(dir="/tmp",delete=False)
+            tf = NamedTemporaryFile(dir=wd,delete=False)
             tf.write("# chunk %i\n"%i)
             tf.write("\n".join(["{infile} {outfile}".format(infile=key,outfile=value) for key,value in chunk.iteritems()]))
             tf.close()

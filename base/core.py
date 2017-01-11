@@ -145,6 +145,7 @@ class RecoRunner(Runner):
                 if "@XROOTD:BASEDIR" in base_dir:
                     base_dir = base_dir.replace("@XROOTD:BASEDIR", get_xrd_base())
                 outfile = infile2outfile(infile,base_dir)
+                print outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)
                     if verify:

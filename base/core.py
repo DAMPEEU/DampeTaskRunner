@@ -236,7 +236,9 @@ class RecoRunner(Runner):
             else:
                 tasks = [opjoin(folders.parent,entry.name) for entry in folders.dirlist if fnmatch(entry.name,pattern)]
                 self.log.info("found %i tasks",len(tasks))
+
                 for i, task in tqdm(enumerate(tasks)):
+                    files_now = len(files_to_process)
                     self.log.info("%i/%i: working on task: %s",i+1,len(tasks),task)
                     is_ok, folders = xc.dirlist(task)
                     if not is_ok.ok:
@@ -244,6 +246,7 @@ class RecoRunner(Runner):
                         continue
                     files_to_process += [lfn(folders.parent, entry.name) for entry in folders.dirlist
                                          if fnmatch(entry.name,"*.root")]
+                    self.log.info("added %i files to processing list",len(files_to_process) - files_now)
         if len(files_to_process):
             self.log.info("check input files")
             for f in tqdm(files_to_process):

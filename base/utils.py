@@ -43,7 +43,7 @@ def isfile(mpath,**kwargs):
         is_ok, res = rc.stat(lfn)
         if not is_ok.ok:
             #print is_ok.message
-            log.error(is_ok.message)
+            log.warning(is_ok.message)
             return False
         if res.flags < OpenFlags.READ:
             msg = 'user has insufficient permissions to READ file.'

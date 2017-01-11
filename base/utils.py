@@ -1,10 +1,25 @@
 from time import sleep as time_sleep
 from psutil import AccessDenied, Process as psutil_proc
-from os.path import isfile
+from os import makedirs
+from os.path import isfile, isdir
 from subprocess import PIPE, Popen
 from XRootD import client
-from XrootD.client.flags import OpenFlags
+from XrootD.client.flags import OpenFlags, MkDirFlags, AccessMode
 
+
+def mkdir(Dir):
+    if Dir.startswith("root://"):
+        server = Dir.split("/")[2]
+        lfn = Dir.replace("root://{server}/".format(server=server),"")
+        xc = client.FileSystem("root://{server}".format(server=server))
+        mode = AccessMode.OR | AccessMode.OW | AccessMode.OX | AccessMode.GR | AccessMode.UR
+        is_ok, reply = xc.mkdir(lfn,flags=MkDirFlags.MAKEPATH,mode=mode)
+        if not is_ok.ok:
+            print is_ok.message
+            raise IOError(is_ok.message)
+    else:
+        if not isdir(Dir):
+            makedirs(Dir)
 
 def run(cmd):
     """

@@ -7,8 +7,8 @@ import logging
 from tqdm import tqdm
 from fnmatch import fnmatch
 from glob import glob
-from os import environ
-from os.path import abspath, join as opjoin
+from os import environ, remove
+from os.path import abspath, isdir, join as opjoin
 from copy import deepcopy
 from yaml import load as yload
 from tempfile import NamedTemporaryFile
@@ -71,6 +71,8 @@ class Runner(object):
 
     def cleanup(self):
         """ clean-up procedure """
+        for f in self.files_to_clean:
+            remove(f)
         pass
 
     def execute(self):
@@ -195,6 +197,10 @@ class RecoRunner(Runner):
 
     def initCycle(self):
         """ initialize each cycle """
+        wd = self.task.get("workdir","/tmp/runner")
+        if not isdir(wd):
+            mkdir(wd)
+
         # need to fill files_to_process
         def lfn(parent,child,xc=None):
             if xc is None: return ""

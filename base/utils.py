@@ -11,7 +11,7 @@ from XRootD.client.flags import OpenFlags, MkDirFlags, AccessMode
 
 # suppress ROOT warnings.
 from ROOT import gROOT, TChain
-gROOT.ProcessLine("gErrorIgnoreLevel = 2002;")
+gROOT.ProcessLine("gErrorIgnoreLevel = 3002;")
 
 log = logging.getLogger("utils")
 

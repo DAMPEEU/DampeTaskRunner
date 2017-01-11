@@ -127,7 +127,7 @@ class RecoRunner(Runner):
                 outfile = opjoin(base_dir,outfile.replace("mc/simu","mc/reco"))
             return outfile
 
-        infiles = outfiles = []
+        files = []
         verify = self.task.get("verify_output",False)
         self.log.info("Requested verification of input files prior to submitting jobs")
         base_dirs = self.storage.get("output_root",["/tmp"])
@@ -155,8 +155,7 @@ class RecoRunner(Runner):
             if bad_file:
                 continue
             self.log.debug("FILE: %s -> %s",infile, outfile)
-            infiles.append(infile)
-            outfiles.append(outfile)
+            files.append((infile,outfile))
 
         # query the job status
         jobs_in_batch = {}
@@ -171,8 +170,6 @@ class RecoRunner(Runner):
                 else:
                     self.jobs[job]=status
 
-        self.log.critical(infiles)
-        self.log.critical(outfiles)
 
         # next, split list into chunks.
         self.log.critical("**DBG**: %s",str(self.batch))
@@ -188,8 +185,7 @@ class RecoRunner(Runner):
             outfiles= outfiles[0:maxfiles-1]
         self.log.critical(infiles)
         self.log.critical(outfiles)
-        arr = array([infiles,outfiles])
-        chunks = array_split(arr.T,nchunks)
+        chunks = array_split(array(files),nchunks)
 
         for i,chunk in tqdm(enumerate(chunks)):
             self.log.critical(dict(chunk.tolist()))

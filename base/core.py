@@ -192,11 +192,11 @@ class RecoRunner(Runner):
             environ['TMP_INPUT']="run.txt"
             environ["EXEC_DIR_ROOT"] = "/tmp"
             environ["DAMPECOMMAND"] = full_cmd
-            environ["FILES_TO_CLEANUP"]=tf.name
+            environ["FILES_TO_CLEANUP"]=abspath(tf.name)
             cmd = "qsub -q {queue} -v DAMPE_PREREQUISITE_SCRIPT,DAMPE_LOGLEVEL,EXEC_DIR_ROOT" \
                   ",TMP_INPUT,INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND,CUSTOM_SLEEP -l mem=6000mb" \
                   "-l vmem=6000mb {launcher}".format(launcher=self.launcher, queue=queue)
-            self.log.info("submitting chunk %i: %s",i, cmd)
+            self.log.info("submitting chunk %i/%i: %s",i+1, nchunks, cmd)
             jobId = -1
             #try:
             #    jobId = submit(cmd)
@@ -204,7 +204,7 @@ class RecoRunner(Runner):
             #    self.log.error(str(err))
             #    continue
             #self.jobs[jobId]="Q"
-            self.files_to_clean.append(abspath(tf.name))
+            #self.files_to_clean.append(abspath(tf.name))
 
     def initCycle(self):
         """ initialize each cycle """

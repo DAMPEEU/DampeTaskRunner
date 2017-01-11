@@ -190,6 +190,8 @@ class RecoRunner(Runner):
         for i in tqdm(range(len(in_chunks))):
             in_chunk = in_chunks[i]
             out_chunk=out_chunks[i]
+            self.log.critical(in_chunk)
+            self.log.critical(out_chunk)
             tf = NamedTemporaryFile(dir=wd,delete=False)
             tf.write("# chunk %i\n"%i)
             for i in range(len(in_chunk)):

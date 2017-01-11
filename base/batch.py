@@ -2,9 +2,12 @@
  @brief: wrapper to handle PBS submission
  @author: S. Zimmer
 """
+import logging
 from re import findall
 from os import getenv
 from base.utils import run as __run__
+
+log = logging.getLogger("batch")
 
 def __regexId__(_str):
     """ returns the batch Id using some regular expression, pbs specific """
@@ -27,7 +30,9 @@ def queryJobs():
     cmd = "qstat -u {user}".format(user=usr)
     rc, output, error = __run__(cmd)
     if rc:
-        raise Exception("error, RC=%i, error msg follows \n %s" % (rc, error))
+        msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
+        log.error(msg)
+        raise Exception(msg)
     lines = output.split("\n")
     if len(lines) > 4:
         rest = output[5:]

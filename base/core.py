@@ -7,6 +7,7 @@ import logging
 from tqdm import tqdm
 from fnmatch import fnmatch
 from glob import glob
+from sys import exit as sys_exit
 from shutil import rmtree
 from os import environ, remove, chdir
 from os.path import abspath, isdir, join as opjoin
@@ -40,11 +41,8 @@ class Runner(object):
 
     def initialize(self):
         if self.config is None: raise RuntimeError("must intialize with config file, found None")
-        self.config = yload(open(abspath(self.config)))
-        assert isinstance(self.config,dict), "must be dictionary type"
+        self.config = parse_config(self.config)
         for groupKey in ['daemon','software','storage','task']:
-            group = self.config.get(groupKey,{})
-            assert isinstance(group, dict) and len(group.keys()), "group must contain dictionary with >0 entries"
             self.__dict__[groupKey].update(group)
         assert self.storage.type in ['xrootd','local'], 'unsupported storage type'
         self.good = True
@@ -75,7 +73,7 @@ class Runner(object):
         for f in self.files_to_clean:
             self.log.debug("cleanup: remove %s",f)
             remove(f)
-
+        sys_exit(0)
 
     def execute(self):
         """ this one executes stuff """
@@ -242,3 +240,12 @@ class RecoRunner(Runner):
                 else:
                     self.log.error("could not add %s",f)
             self.log.info("found %i files to process this cycle",len(self.files_to_process))
+
+
+def parse_config(cfg):
+    config = yload(open(abspath(cfg)))
+    assert isinstance(config, dict), "must be dictionary type"
+    for groupKey in ['daemon', 'software', 'storage', 'task']:
+        group = config.get(groupKey, {})
+        assert isinstance(group, dict) and len(group.keys()), "group must contain dictionary with >0 entries"
+    return config

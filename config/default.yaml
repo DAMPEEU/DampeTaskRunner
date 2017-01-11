@@ -1,7 +1,7 @@
 daemon:
  pidfile: /tmp/proc/DampeTaskRunner.pid
  logfile: /tmp/log/DampeTaskRunner.log
- loglevel: INFO
+ loglevel: ["INFO","INFO"]
  sleeptime: 300.
  cycles:    200
 

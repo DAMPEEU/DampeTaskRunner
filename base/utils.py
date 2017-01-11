@@ -1,11 +1,23 @@
+import logging
 from time import sleep as time_sleep
 from psutil import AccessDenied, Process as psutil_proc
-from os import makedirs
+from os import makedirs, utime
 from os.path import isfile, isdir
 from subprocess import PIPE, Popen
+
+# add XRootD python bindings: http://xrootd.org/doc/python/xrootd-python/index.html
 from XRootD import client
 from XrootD.client.flags import OpenFlags, MkDirFlags, AccessMode
 
+# suppress ROOT warnings.
+from ROOT import gROOT, TChain
+gROOT.ProcessLine("gErrorIgnoreLevel = 2002;")
+
+log = logging.getLogger("utils")
+
+def touch(path):
+    with open(path, 'a'):
+        utime(path, None)
 
 def mkdir(Dir):
     if Dir.startswith("root://"):
@@ -17,6 +29,7 @@ def mkdir(Dir):
         if not is_ok.ok:
             print is_ok.message
             raise IOError(is_ok.message)
+        log.debug(is_ok.message)
     else:
         if not isdir(Dir):
             makedirs(Dir)
@@ -32,9 +45,12 @@ def isfile(mpath,**kwargs):
         is_ok, res = rc.stat(lfn)
         if not is_ok.ok:
             print is_ok.message
+            log.error(is_ok.message)
             return False
         if res.flags < OpenFlags.READ:
-            print 'user has insufficient permissions to READ file.'
+            msg = 'user has insufficient permissions to READ file.'
+            print msg
+            log.error(msg)
             return False
         else:
             return True
@@ -53,23 +69,20 @@ def run(cmd):
     output = tsk.stdout.read()
     error = tsk.stderr.read()
     if rc:
-        raise Exception("error, RC=%i, error msg follows \n %s" % (rc, error))
+        msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
+        log.error(msg)
+        raise RuntimeError(msg)
     return rc, output, error
 
 def get_chunks(MyList, n):
   return [MyList[x:x+n] for x in range(0, len(MyList), n)]
 
-
-
-
 def verifyDampeMC(self,fn, ftype = 'reco'):
     """ open root file, check if branches are in there and if metdata is != 0, else return false """
-
     assert ftype in ['reco','digi'], "must be of type digi or reco"
     branches = ['StkKalmanTracks','DmpEvtBgoRec','StkClusterCollection','DmpEvtPsdRec','DmpGlobTracks']
     if ftype == 'digi':
         branches = ['DmpStkDigitsCollection','DmpEvtNudRaw','DmpEvtBgoHits','DmpPsdHits']
-    from ROOT import TChain
     tch = TChain("CollectionTree")
     tch.Add(fn)
     if not tch.GetEntries():
@@ -198,6 +211,9 @@ class ProcessResourceMonitor(ResourceMonitor):
         self.query()
         return self.user + self.system
 
+    def queryResources(self):
+        return "MEM: {memory} MB  -- CPU: {cpu} seconds".format(memory=self.getMemory(),cpu=self.getCpuTime())
+
     def free(self):
         self.user = 0
         self.system = 0
@@ -211,7 +227,9 @@ class ProcessResourceMonitor(ResourceMonitor):
         usr = cpu.user
         sys = cpu.system
         mem = self.ps.memory_info().rss / float(2 ** 20)
-        if dbg: print '**DEBUG**: parent: pid %i mem %1.1f sys %1.1f usr %1.1f' % (self.ps.pid, mem, sys, usr)
+        msg = 'parent: pid %i mem %1.1f sys %1.1f usr %1.1f' % (self.ps.pid, mem, sys, usr)'
+        if dbg: print '**DEBUG**:',msg
+        log.debug(msg)
         child_pids = []
         for child in self.ps.children(recursive=True):
             if int(child.pid) not in child_pids:
@@ -219,21 +237,26 @@ class ProcessResourceMonitor(ResourceMonitor):
                     ch = self._getChildUsage(child)
                     ch['pid'] = int(child.pid)
                     ch['total'] = ch['user'] + ch['system']
-                    if dbg:
-                        print '**DEBUG**: CHILD FOOTPRINT: {pid} MEM {memory}'\
+                    msg = 'CHILD FOOTPRINT: {pid} MEM {memory}'\
                               'USR {user} SYS {system} TOT {total}'.format(**ch)
+                    log.debug(msg)
+                    if dbg:
+                        print '**DEBUG**:',msg
                     usr += ch['user']
                     sys += ch['system']
                     mem += ch['memory']
                     child_pids.append(int(child.pid))
                 except AccessDenied:
-                    print 'could not access %i, skipping.' % int(child.pid)
+                    msg = 'could not access %i, skipping.' % int(child.pid)
+                    log.warning(msg)
+                    print msg
         self.user = usr
         self.system = sys
         self.memory = mem
-        if dbg: print 'child pids today : ', child_pids
-        if dbg: print '**** DEBUG **** TOTAL this cycle: mem=%1.1f sys=%1.1f usr=%1.1f' % (
-        self.memory, self.system, self.user)
+        msg = 'child pids today : ', child_pids
+        msg+= 'TOTAL this cycle: mem=%1.1f sys=%1.1f usr=%1.1f' % (self.memory, self.system, self.user)'
+        log.debug(msg)
+        if dbg: print '**** DEBUG ****',msg
 
     def _getChildUsage(self, ps):
         if not isinstance(ps, psutil_proc):
@@ -243,4 +266,3 @@ class ProcessResourceMonitor(ResourceMonitor):
         sys = cpu.system
         mem = ps.memory_info().rss / float(2 ** 20)
         return {'memory': mem, 'system': sys, 'user': usr}
-

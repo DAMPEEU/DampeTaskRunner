@@ -54,7 +54,8 @@ def main(argv=None):
             parent, child = loglevel[0],loglevel[1]
         else:
             loglevel = loglevel[0]
-    if isinstance(loglevel,str): parent = child = loglevel
+    elif isinstance(loglevel, str):
+        parent = child = loglevel
     else: raise Exception("could not interpret log level.")
     initLogger(logfile, level=parent, childlevel=child)
     log = logging.getLogger("core")

@@ -27,7 +27,7 @@ def mkdir(Dir):
         mode = AccessMode.OR | AccessMode.OW | AccessMode.OX | AccessMode.GR | AccessMode.UR
         is_ok, reply = xc.mkdir(lfn,flags=MkDirFlags.MAKEPATH,mode=mode)
         if not is_ok.ok:
-            print is_ok.message
+            #print is_ok.message
             raise IOError(is_ok.message)
         log.debug(is_ok.message)
     else:
@@ -42,12 +42,12 @@ def isfile(mpath,**kwargs):
         rc = client.FileSystem(server)
         is_ok, res = rc.stat(lfn)
         if not is_ok.ok:
-            print is_ok.message
+            #print is_ok.message
             log.error(is_ok.message)
             return False
         if res.flags < OpenFlags.READ:
             msg = 'user has insufficient permissions to READ file.'
-            print msg
+            #print msg
             log.error(msg)
             return False
         else:

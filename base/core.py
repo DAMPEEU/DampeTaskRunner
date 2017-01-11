@@ -16,7 +16,7 @@ from base.utils import sleep, abstractmethod, verifyDampeMC, isfile, get_chunks,
 from base.batch import submit, queryJobs
 from XRootD import client
 
-class TaskRunner(object):
+class Runner(object):
     """
 
         abstract base class, put all the annoying stuff here, focus on implementation in specific Runner derivatives
@@ -25,6 +25,7 @@ class TaskRunner(object):
     """
     def __init__(self,config=None):
         # some default values.
+        self.files_to_clean = []
         self.good = False
         self.launcher = None
         self.daemon = {}
@@ -84,7 +85,7 @@ class TaskRunner(object):
         self.cleanup()
         # reached last cycle
 
-class RecoRunner(TaskRunner):
+class RecoRunner(Runner):
     """ this runner does the following each cycle:
 
         init: create a new listing, comparing what's in input & output folders, verify files, if requested
@@ -190,6 +191,7 @@ class RecoRunner(TaskRunner):
                 self.log.error(str(err))
                 continue
             self.jobs[jobId]="Q"
+            self.files_to_clean.append(abspath(tf.name))
 
     def initCycle(self):
         """ initialize each cycle """

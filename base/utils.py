@@ -201,8 +201,8 @@ class ProcessResourceMonitor(ResourceMonitor):
                     ch['pid'] = int(child.pid)
                     ch['total'] = ch['user'] + ch['system']
                     if dbg:
-                        print '**DEBUG**: CHILD FOOTPRINT: {pid} MEM {memory} USR {user} SYS {system} TOT {total}'.format(
-                            **ch)
+                        print '**DEBUG**: CHILD FOOTPRINT: {pid} MEM {memory}'\
+                              'USR {user} SYS {system} TOT {total}'.format(**ch)
                     usr += ch['user']
                     sys += ch['system']
                     mem += ch['memory']

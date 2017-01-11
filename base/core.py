@@ -47,7 +47,7 @@ class Runner(object):
             group = self.config[groupKey]
             assert len(group.keys()), "{group} must contain more than 0 keys".format(group=groupKey)
             self.__dict__[groupKey].update(self.config[groupKey])
-        assert self.storage.type in ['xrootd','local'], 'unsupported storage type'
+        assert self.storage.get("type","") in ['xrootd','local'], 'unsupported storage type'
         self.good = True
         self.log.info("setting software environment")
         # set software env

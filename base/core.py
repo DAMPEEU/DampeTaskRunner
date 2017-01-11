@@ -128,6 +128,7 @@ class RecoRunner(Runner):
 
         infiles = outfiles = []
         verify = self.task.get("verify_output",False)
+        self.log.info("Requested verification of input files prior to submitting jobs")
         base_dirs = self.storage.get("output_root",["/tmp"])
 
         for f in self.files_to_process:
@@ -152,6 +153,7 @@ class RecoRunner(Runner):
                     base_dirs.pop(0) # remove the first element
             if bad_file:
                 continue
+            self.log.debug("FILE: %s -> %s",infile, outfile)
             infiles.append(infile)
             outfiles.append(outfile)
 

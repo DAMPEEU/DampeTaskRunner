@@ -183,6 +183,8 @@ class RecoRunner(Runner):
         if len(infiles) >= maxfiles:
             infiles = infiles[0:maxfiles-1]
             outfiles= outfiles[0:maxfiles-1]
+        self.log.critical(infiles)
+        self.log.critical(outfiles)
         arr = array([infiles,outfiles])
         chunks = array_split(arr.T,nchunks)
 

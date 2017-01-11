@@ -124,6 +124,8 @@ class RecoRunner(Runner):
             return kret
 
         def infile2outfile(infile,base_dir,method='simu:reco'):
+            print infile
+            print base_dir
             outfile = deepcopy(infile)
             methods = ['simu:reco']
             assert method in methods, "have not implemented other methods yet, signal urgency to zimmer@cern.ch"

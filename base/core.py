@@ -161,6 +161,7 @@ class RecoRunner(Runner):
                     base_dir = base_dir.replace("@XROOTD:BASEDIR", self.__get_xrd_base__())
                     target = 'xrootd'
                 outfile = infile2outfile(infile,target=target)
+                print outfile
                 if target != 'xrootd':
                     outfile = opjoin(base_dir,outfile)
                 print outfile

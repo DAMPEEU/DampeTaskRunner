@@ -187,8 +187,9 @@ class RecoRunner(Runner):
         in_chunks = get_chunks(infiles,nfiles)
         out_chunks= get_chunks(outfiles,nfiles)
 
-        for i in tqdm(range(nchunks)):
+        for i in tqdm(range(len(in_chunks))):
             chunk = dict(zip(in_chunks[i],out_chunks[i]))
+            self.log.critical(str(chunk))
             tf = NamedTemporaryFile(dir=wd,delete=False)
             tf.write("# chunk %i\n"%i)
             for inf, of in chunk.iteritems():

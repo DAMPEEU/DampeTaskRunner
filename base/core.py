@@ -171,7 +171,7 @@ class RecoRunner(Runner):
                     self.jobs[job]=status
 
         # next, split list into chunks.
-        self.log.info("**DBG**: %s",str(self.batch))
+        self.log.critical("**DBG**: %s",str(self.batch))
         nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
         nfiles  = self.task.get("max_files_per_job",10)
         maxfiles = nfiles * nchunks

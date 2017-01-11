@@ -4,6 +4,7 @@ Created on Jan 9, 2017
 @author: zimmer
 '''
 import logging
+from numpy import array, array_split
 from tqdm import tqdm
 from fnmatch import fnmatch
 from glob import glob
@@ -182,21 +183,16 @@ class RecoRunner(Runner):
         if len(infiles) >= maxfiles:
             infiles = infiles[0:maxfiles-1]
             outfiles= outfiles[0:maxfiles-1]
+        arr = array([infiles,outfiles]).T
 
-        # evenly split chunks.
-        in_chunks = get_chunks(infiles,nfiles)
-        out_chunks= get_chunks(outfiles,nfiles)
+        chunks = array_split(arr,nchunks)
 
-        for i in tqdm(range(len(in_chunks))):
-            in_chunk = in_chunks[i]
-            out_chunk=out_chunks[i]
-            self.log.critical(in_chunk)
-            self.log.critical(out_chunk)
+        for i in tqdm(range(len(chunks))):
+            chunk = dict(chunks[i].tolist())
+            self.log.critical(chunk)
             tf = NamedTemporaryFile(dir=wd,delete=False)
             tf.write("# chunk %i\n"%i)
-            for i in range(len(in_chunk)):
-                inf = in_chunk[i]
-                of  = out_chunk[i]
+            for inf, of in chunk.iteritems():
                 self.log.debug("CHUNKFILE: %s -> %s", inf, of)
                 tf.write("{infile} {outfile}\n".format(infile=inf, outfile=of))
             tf.close()

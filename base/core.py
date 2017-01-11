@@ -149,10 +149,10 @@ class RecoRunner(Runner):
 
         for f in self.files_to_process:
             infile = f
-
-            if len(base_dirs):
+            bd = deepcopy(base_dirs)
+            if len(bd):
                 #print base_dirs
-                base_dir = base_dirs[0]
+                base_dir = bd[0]
                 self.log.debug("using basedir: %s",base_dir)
                 target = 'local'
                 if "@XROOTD:BASEDIR" in base_dir:
@@ -173,7 +173,7 @@ class RecoRunner(Runner):
                             continue
                         else:
                             self.log.info("verification of ROOT file failed")
-                            base_dirs.pop(0) # remove the first element
+                            bd.pop(0) # remove the first element
                     else:
                         self.log.info("skipping verification, skipping file.")
                         continue

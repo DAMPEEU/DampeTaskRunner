@@ -31,7 +31,7 @@ class Runner(object):
         self.good = False
         self.launcher = None
         self.cycle = 0
-        self.cycles= -1
+        self.cycles= 1000
         self.daemon = {}
         self.software={}
         self.batch = {}
@@ -53,6 +53,8 @@ class Runner(object):
         self.good = True
         self.log.info("setting software environment")
         # set software env
+        self.cycles = self.daemon.get("cycles",1000)
+        self.log.info("requested to run %i cycles",len(self.cycles))
         self.launcher = self.software.get("launcher",None)
         environ["DAMPE_PREREQUISITE_SCRIPT"]=self.software.get("externals_path","/tmp")
         environ["DAMPME_INSTALL_PATH"]=self.software.get("install_path","/tmp")

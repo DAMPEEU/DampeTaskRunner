@@ -253,7 +253,7 @@ class ProcessResourceMonitor(ResourceMonitor):
         self.user = usr
         self.system = sys
         self.memory = mem
-        msg = 'child pids today : ', child_pids
+        msg = 'child pids today : %s' % str( child_pids )
         msg+= 'TOTAL this cycle: mem=%1.1f sys=%1.1f usr=%1.1f' % (self.memory, self.system, self.user)
         log.debug(msg)
         if dbg: print '**** DEBUG ****',msg

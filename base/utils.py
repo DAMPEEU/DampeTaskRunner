@@ -77,7 +77,7 @@ def run(cmd):
 def get_chunks(MyList, n):
   return [MyList[x:x+n] for x in range(0, len(MyList), n)]
 
-def verifyDampeMC(self,fn, ftype = 'reco'):
+def verifyDampeMC(fn, ftype = 'reco'):
     """ open root file, check if branches are in there and if metdata is != 0, else return false """
     assert ftype in ['reco','digi'], "must be of type digi or reco"
     branches = ['StkKalmanTracks','DmpEvtBgoRec','StkClusterCollection','DmpEvtPsdRec','DmpGlobTracks']

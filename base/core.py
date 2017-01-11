@@ -171,10 +171,11 @@ class RecoRunner(Runner):
                     self.jobs[job]=status
 
         # next, split list into chunks.
-        nchunks = self.task.get("max_jobs",10) - len(self.jobs.keys())
+        nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
         nfiles  = self.task.get("max_files_per_job",10)
         maxfiles = nfiles * nchunks
         queue = self.batch.get("queue","short")
+        memory= self.batch.get("memory","100Mb")
         if len(infiles) >= maxfiles:
             infiles = infiles[0:maxfiles-1]
             outfiles= outfiles[0:maxfiles-1]
@@ -199,8 +200,8 @@ class RecoRunner(Runner):
             environ["DAMPECOMMAND"] = full_cmd
             environ["FILES_TO_CLEANUP"]=abspath(tf.name)
             cmd = "qsub -q {queue} -v DAMPE_PREREQUISITE_SCRIPT,DAMPE_LOGLEVEL,EXEC_DIR_ROOT" \
-                  ",TMP_INPUT,INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND,CUSTOM_SLEEP -l mem=6000mb" \
-                  "-l vmem=6000mb {launcher}".format(launcher=self.launcher, queue=queue)
+                  ",TMP_INPUT,INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND,CUSTOM_SLEEP -l mem={memory}" \
+                  " -l vmem={memory} {launcher}".format(launcher=self.launcher, queue=queue, memory=memory)
             self.log.info("submitting chunk %i/%i: %s",i+1, nchunks, cmd)
             jobId = -1
             #try:

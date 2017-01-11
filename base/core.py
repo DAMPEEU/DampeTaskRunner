@@ -29,6 +29,7 @@ class Runner(object):
     def __init__(self,config=None):
         # some default values.
         self.files_to_clean = []
+        self.processed_files= []
         self.good = False
         self.launcher = None
         self.cycle = 0
@@ -154,6 +155,7 @@ class RecoRunner(Runner):
         base_dirs = self.task.get("output_root",["/tmp"])
 
         for f in self.files_to_process:
+            if f in self.processed_files: continue
             infile = f
             skip = False
             outfilesF = []
@@ -191,7 +193,7 @@ class RecoRunner(Runner):
             self.log.debug("FILE: %s -> %s", infile, outfilesF[0])
             if len(files) >= maxfiles: break
             files.append((infile, outfilesF[0]))
-
+            self.processed_files.append(infile)
         # query the job status
         jobs_in_batch = {}
         try:
@@ -228,13 +230,13 @@ class RecoRunner(Runner):
                   " -l vmem={memory} {launcher}".format(launcher=self.launcher, queue=queue, memory=memory)
             self.log.info("submitting chunk %i/%i: %s",i+1, nchunks, cmd)
             jobId = -1
-            try:
-                jobId = submit(cmd)
-            except Exception as err:
-                self.log.error(str(err))
-                continue
-            self.jobs[jobId]="Q"
-            self.files_to_clean.append(abspath(tf.name))
+            # try:
+            #     jobId = submit(cmd)
+            # except Exception as err:
+            #     self.log.error(str(err))
+            #     continue
+            # self.jobs[jobId]="Q"
+            # self.files_to_clean.append(abspath(tf.name))
 
     def initCycle(self):
         """ initialize each cycle """
@@ -288,6 +290,7 @@ class RecoRunner(Runner):
         if len(files_to_process):
             self.log.info("check input files")
             for f in tqdm(files_to_process):
+                if f in self.processed_files: continue # skip
                 if isfile(f): self.files_to_process.append(f)
                 else:
                     self.log.error("could not add %s",f)

@@ -4,7 +4,7 @@ Created on Jan 9, 2017
 @author: zimmer
 '''
 import logging
-from numpy import array, array_split
+from numpy import array, array_split, savetxt
 from tqdm import tqdm
 from fnmatch import fnmatch
 from glob import glob
@@ -15,7 +15,7 @@ from os.path import abspath, isdir, join as opjoin
 from copy import deepcopy
 from yaml import load as yload
 from tempfile import NamedTemporaryFile
-from base.utils import sleep, abstractmethod, verifyDampeMC, mkdir, isfile, get_chunks
+from base.utils import sleep, abstractmethod, verifyDampeMC, mkdir, isfile
 from base.batch import submit, queryJobs
 from XRootD import client
 
@@ -183,19 +183,12 @@ class RecoRunner(Runner):
         if len(infiles) >= maxfiles:
             infiles = infiles[0:maxfiles-1]
             outfiles= outfiles[0:maxfiles-1]
-        arr = array([infiles,outfiles]).T
+        chunks = array_split(arr.T,nchunks)
 
-        chunks = array_split(arr,nchunks)
-
-        for i in tqdm(range(len(chunks))):
-            chunk = dict(chunks[i].tolist())
-            self.log.critical(chunk)
+        for i,chunk in tqdm(enumerate(chunks)):
+            self.log.critical(dict(chunk.tolist()))
             tf = NamedTemporaryFile(dir=wd,delete=False)
-            tf.write("# chunk %i\n"%i)
-            for inf, of in chunk.iteritems():
-                self.log.debug("CHUNKFILE: %s -> %s", inf, of)
-                tf.write("{infile} {outfile}\n".format(infile=inf, outfile=of))
-            tf.close()
+            savetxt(tf.name,chunk,fmt="%s",header="chunk %i"%(i+1),delimiter=" ")
             self.log.debug("chunkfile: %s",tf.name)
             full_cmd = "{cmd} -t run.txt".format(cmd=self.task.get("command","python"))
             environ['INPUTFILE']=tf.name

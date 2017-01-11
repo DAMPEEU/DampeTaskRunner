@@ -10,12 +10,12 @@ from fnmatch import fnmatch
 from glob import glob
 from sys import exit as sys_exit
 from shutil import rmtree
-from os import environ, remove, chdir
+from os import environ, getenv, remove, chdir
 from os.path import abspath, isdir, join as opjoin
 from copy import deepcopy
 from yaml import load as yload
 from tempfile import NamedTemporaryFile
-from base.utils import sleep, abstractmethod, verifyDampeMC, mkdir, isfile
+from base.utils import sleep, abstractmethod, verifyDampeMC, mkdir, isfile, extractVersionTag
 from base.batch import submit, queryJobs
 from XRootD import client
 
@@ -59,6 +59,7 @@ class Runner(object):
         self.launcher = self.software.get("launcher",None)
         environ["DAMPE_PREREQUISITE_SCRIPT"]=self.software.get("externals_path","/tmp")
         environ["DAMPME_INSTALL_PATH"]=self.software.get("install_path","/tmp")
+        environ["DAMPE_VERSION_TAG"]=self.software.get("version","v5r3p0")
         for key,value in self.software.get("env_vars",{}).iteritems():
             environ[key]=value
 
@@ -125,6 +126,8 @@ class RecoRunner(Runner):
 
 
         def infile2outfile(infile,target='xrootd',method='simu:reco'):
+            vtag = getenv("DAMPE_VERSION_TAG","v5r3p0")
+            ctag = extractVersionTag(infile)
             lfn = infile
             server = ""
             if infile.startswith("root://"):
@@ -132,6 +135,9 @@ class RecoRunner(Runner):
                 lfn = lfn.replace(server,"")
             lfn_in = lfn
             outfile = deepcopy(lfn_in)
+
+            while ctag in outfile:
+                outfile = outfile.replace(ctag,vtag)
 
             methods = ['simu:reco']
             assert method in methods, "have not implemented other methods yet, signal urgency to zimmer@cern.ch"

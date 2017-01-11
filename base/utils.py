@@ -4,6 +4,7 @@ from psutil import AccessDenied, Process as psutil_proc
 from os import makedirs, utime
 from os.path import isfile as op_isfile, isdir
 from subprocess import PIPE, Popen
+from re import finditer
 
 # add XRootD python bindings: http://xrootd.org/doc/python/xrootd-python/index.html
 from XRootD import client
@@ -14,6 +15,17 @@ from ROOT import gROOT, TChain
 gROOT.ProcessLine("gErrorIgnoreLevel = 3002;")
 
 log = logging.getLogger("utils")
+
+def extractVersionTag(lfn):
+    """ returns the proper version tag from a long file."""
+    pattern = "v[0-9]+r[0-9]+p[0-9]+"
+    match = None
+    for m in finditer(pattern,lfn):
+        match = m
+    if match is None:
+        raise Exception("could not find version tag.")
+    return lfn[match.start():match.end()]
+
 
 def touch(path):
     with open(path, 'a'):

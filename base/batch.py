@@ -21,6 +21,8 @@ def __regexId__(_str):
 def submit(cmd):
     """ convenience method to wrap batch submission, will return jobID"""
     rc, output, error = __run__(cmd)
+    if rc:
+        raise RuntimeError(error)
     return __regexId__(output)
 
 def queryJobs():

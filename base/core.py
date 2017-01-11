@@ -14,7 +14,7 @@ from os.path import abspath, isdir, join as opjoin
 from copy import deepcopy
 from yaml import load as yload
 from tempfile import NamedTemporaryFile
-from base.utils import sleep, abstractmethod, verifyDampeMC, mkdir, isfile, get_chunks, run
+from base.utils import sleep, abstractmethod, verifyDampeMC, mkdir, isfile, get_chunks
 from base.batch import submit, queryJobs
 from XRootD import client
 
@@ -43,7 +43,7 @@ class Runner(object):
         if self.config is None: raise RuntimeError("must intialize with config file, found None")
         self.config = parse_config(self.config)
         for groupKey in ['daemon','software','storage','task']:
-            self.__dict__[groupKey].update(group)
+            self.__dict__[groupKey].update(self.config[groupKey])
         assert self.storage.type in ['xrootd','local'], 'unsupported storage type'
         self.good = True
         self.log.info("setting software environment")
@@ -65,7 +65,7 @@ class Runner(object):
     def sleep(self):
         """ sleep for some time """
         st = self.daemon.get("sleeptime",300)
-        self.log.info("cycle completed, will sleep for {sleep}".format(sleep=st))
+        self.log.info("cycle completed, will sleep for %s"st)
         sleep(st)
 
     def cleanup(self):
@@ -100,7 +100,7 @@ class RecoRunner(Runner):
     def runCycle(self):
         """ run in each cycle """
 
-        def get_xrd_base(self):
+        def get_xrd_base(   ):
             kret = ""
             if self.storage_type == 'xrootd':
                 kret = "root://{server}:{port}/{base_dir}".format(server=self.storage.get("server", "localhost"),
@@ -130,7 +130,7 @@ class RecoRunner(Runner):
                     base_dir = base_dir.replace("@XROOTD:BASEDIR", get_xrd_base())
                 outfile = infile2outfile(infile,base_dir)
                 if isfile(outfile):
-                    self.log.debug("found %s already"%outfile)
+                    self.log.debug("found %s already",outfile)
                     if verify:
                         if verifyDampeMC(outfile):
                             self.log.info("verification of ROOT file successful, skipping")
@@ -181,11 +181,12 @@ class RecoRunner(Runner):
             environ['INPUTFILE']=tf.name
             environ['TMP_INPUT']="run.txt"
             environ["EXEC_DIR_ROOT"] = "/tmp"
+            environ["DAMPECOMMAND"] = full_cmd
             environ["FILES_TO_CLEANUP"]=tf.name
             cmd = "qsub -q {queue} -v DAMPE_PREREQUISITE_SCRIPT,DAMPE_LOGLEVEL,EXEC_DIR_ROOT" \
                   ",TMP_INPUT,INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND,CUSTOM_SLEEP -l mem=6000mb" \
                   "-l vmem=6000mb {launcher}".format(launcher=self.launcher, queue=queue)
-            self.log.info("submitting {ch}: {cmd}".format(ch=i,cmd=cmd))
+            self.log.info("submitting chunk %i: %s",i, cmd)
             jobId = -1
             try:
                 jobId = submit(cmd)
@@ -205,7 +206,7 @@ class RecoRunner(Runner):
         # need to fill files_to_process
         def lfn(parent,child,xc=None):
             if xc is None: return ""
-            return "root://{server}/{fname}".format(fname=entry,server=xc.url.hostid)
+            return "root://{server}/{fname}".format(fname=opjoin(parent,child),server=xc.url.hostid)
 
         files_to_process = []
         pattern = self.task.get("pattern","*")

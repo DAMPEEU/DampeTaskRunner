@@ -34,7 +34,6 @@ def main(argv=None):
                 proc.terminate()
             else:
                 sleep(600.)  # check every 5 minutes
-
         log.info("Execution complete")
 
     parser = ArgumentParser(description="main script to execute DAMPE Task Runner")

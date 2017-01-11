@@ -90,7 +90,7 @@ def verifyDampeMC(self,fn, ftype = 'reco'):
     try:
         for b in branches:
             r = tch.FindBranch(b)
-            assert not(r == None), 'missing branch : %s'%b
+            assert r is not None, 'missing branch : %s'%b
     except AssertionError:
         return False
     return True
@@ -227,7 +227,7 @@ class ProcessResourceMonitor(ResourceMonitor):
         usr = cpu.user
         sys = cpu.system
         mem = self.ps.memory_info().rss / float(2 ** 20)
-        msg = 'parent: pid %i mem %1.1f sys %1.1f usr %1.1f' % (self.ps.pid, mem, sys, usr)'
+        msg = 'parent: pid %i mem %1.1f sys %1.1f usr %1.1f' % (self.ps.pid, mem, sys, usr)
         if dbg: print '**DEBUG**:',msg
         log.debug(msg)
         child_pids = []

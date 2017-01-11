@@ -163,7 +163,7 @@ class RecoRunner(Runner):
                 if target == 'local':
                     outfile = "".join([base_dir,outfile])
                     while "//" in outfile:
-                        outfile = outfile("//","/")
+                        outfile = outfile.replace("//","/")
                 #print outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)

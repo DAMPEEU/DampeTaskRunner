@@ -42,7 +42,10 @@ class Runner(object):
     def initialize(self):
         if self.config is None: raise RuntimeError("must intialize with config file, found None")
         self.config = parse_config(self.config)
+        self.config['task'] = self.config['tasks'].get(self.__class__.__name__,{})
         for groupKey in ['daemon','software','storage','task']:
+            group = self.config[groupKey]
+            assert len(group.keys()), "{group} must contain more than 0 keys".format(group=groupKey)
             self.__dict__[groupKey].update(self.config[groupKey])
         assert self.storage.type in ['xrootd','local'], 'unsupported storage type'
         self.good = True
@@ -246,7 +249,7 @@ class RecoRunner(Runner):
 def parse_config(cfg):
     config = yload(open(abspath(cfg)))
     assert isinstance(config, dict), "must be dictionary type"
-    for groupKey in ['daemon', 'software', 'storage', 'task']:
+    for groupKey in ['daemon', 'software', 'storage']:
         group = config.get(groupKey, {})
-        assert isinstance(group, dict) and len(group.keys()), "group must contain dictionary with >0 entries"
+        assert isinstance(group, dict), "{group} must be of type dictionary".format(group=groupKey)
     return config

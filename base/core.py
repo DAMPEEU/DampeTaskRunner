@@ -124,16 +124,23 @@ class RecoRunner(Runner):
         self.log.debug("#chunks %i | #files %i | #total files %i",nchunks, nfiles, maxfiles)
 
 
-        def infile2outfile(infile,base_dir,method='simu:reco'):
-            print infile
-            print base_dir
-            outfile = deepcopy(infile)
+        def infile2outfile(infile,target='xrootd',method='simu:reco'):
+            lfn = infile
+            server = ""
+            if infile.startswith("root://"):
+                server = "root://{server}/".format(server=lfn.split("/")[2])
+                lfn = lfn.replace(server,"")
+            lfn_in = lfn
+            outfile = deepcopy(lfn_in)
+
             methods = ['simu:reco']
             assert method in methods, "have not implemented other methods yet, signal urgency to zimmer@cern.ch"
             if method == 'simu:reco':
-                outfile = outfile.replace(".mc.root",".reco.root")
-                outfile = opjoin(base_dir,outfile.replace("mc/simu","mc/reco"))
-            return outfile
+                outfile = (outfile.replace(".mc.root",".reco.root")).replace("mc/simu","mc/reco")
+            lfn_out= outfile
+            if target == 'xrootd':
+                return "{server}/{lfn}".format(server=server,lfn=lfn_out)
+            return lfn_out
 
         files = []
         verify = self.task.get("verify_output",False)
@@ -143,11 +150,15 @@ class RecoRunner(Runner):
         for f in self.files_to_process:
             infile = f
             bad_file = False
+            target = 'local'
             while len(base_dirs):
                 base_dir = base_dirs[0]
                 if "@XROOTD:BASEDIR" in base_dir:
                     base_dir = base_dir.replace("@XROOTD:BASEDIR", self.__get_xrd_base__())
-                outfile = infile2outfile(infile,base_dir)
+                    target = 'xrootd'
+                outfile = infile2outfile(infile,target=target)
+                if target != 'xrootd':
+                    outfile = opjoin(base_dir,outfile)
                 print outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)

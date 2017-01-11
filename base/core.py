@@ -109,6 +109,11 @@ class RecoRunner(Runner):
         """ run in each cycle """
         wd = self.task.get("workdir", "/tmp/runner")
         chdir(wd)
+        # next, split list into chunks.
+        nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
+        nfiles  = self.task.get("max_files_per_job",10)
+        maxfiles = nfiles * nchunks
+        self.log.debug("#chunks %i | #files %i | #total files %i",nchunks, nfiles, maxfiles)
 
         def get_xrd_base(   ):
             kret = ""
@@ -155,6 +160,7 @@ class RecoRunner(Runner):
             if bad_file:
                 continue
             self.log.debug("FILE: %s -> %s",infile, outfile)
+            if len(files) >= maxfiles: break
             files.append((infile,outfile))
 
         # query the job status
@@ -171,20 +177,10 @@ class RecoRunner(Runner):
                     self.jobs[job]=status
 
 
-        # next, split list into chunks.
-        self.log.critical("**DBG**: %s",str(self.batch))
-        nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
-        nfiles  = self.task.get("max_files_per_job",10)
-        maxfiles = nfiles * nchunks
-        self.log.debug("#chunks %i | #files %i | #total files %i",nchunks, nfiles, maxfiles)
 
         queue = self.batch.get("queue","short")
         memory= self.batch.get("mem","100Mb")
-        if len(infiles) >= maxfiles:
-            infiles = infiles[0:maxfiles-1]
-            outfiles= outfiles[0:maxfiles-1]
-        self.log.critical(infiles)
-        self.log.critical(outfiles)
+
         chunks = array_split(array(files),nchunks)
 
         for i,chunk in tqdm(enumerate(chunks)):

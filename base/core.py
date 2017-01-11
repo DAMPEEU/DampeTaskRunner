@@ -237,7 +237,7 @@ class RecoRunner(Runner):
                 tasks = [opjoin(folders.parent,entry.name) for entry in folders.dirlist if fnmatch(entry.name,pattern)]
                 self.log.info("found %i tasks",len(tasks))
                 for i, task in tqdm(enumerate(tasks)):
-                    self.log.info("working on %i task",i)
+                    self.log.info("%i/%i: working on task: %s",i+1,len(tasks),task)
                     is_ok, folders = xc.dirlist(task)
                     if not is_ok.ok:
                         self.log.error(is_ok.message)

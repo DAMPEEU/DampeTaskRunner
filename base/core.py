@@ -173,7 +173,7 @@ class RecoRunner(Runner):
                     while "//" in outfile:
                         outfile = outfile.replace("//","/")
                 outfilesF.append(outfile)
-                #print outfile
+                print base_dir, outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)
                     if verify:

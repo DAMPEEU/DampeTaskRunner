@@ -91,15 +91,30 @@ class Runner(object):
 
     def cleanup(self):
         """ clean-up procedure """
+        self.files_to_clean.append(self.daemon['pidfile'])
         for f in self.files_to_clean:
             self.log.debug("cleanup: remove %s",f)
             remove(f)
         sys_exit(0)
 
+    def flush(self,keepErrors=False):
+        """ cleanup in each cycle! """
+        pattern = "{path}/{launcher}.*"
+        if keepErrors:
+            pattern = "{path}/*/{launcher}.o*"
+        launcher = basename(self.launcher)
+        files_to_remove = glob(pattern.format(path=abspath(basename(self.workdir)), launcher=launcher))
+        self.log.info("cleanup cycle, found %i files to clean",len(files_to_remove))
+        for f in files_to_remove:
+            self.log.debug("cleanup: remove %s", f)
+            remove(f)
+        return
+
     def execute(self):
         """ this one executes stuff """
         while self.cycle < self.cycles:
             self.log.info("entering cycle %i/%i", self.cycle, self.cycles)
+            self.flush()
             self.initCycle()
             self.runCycle()
             self.sleep()
@@ -148,7 +163,7 @@ class RecoRunner(Runner):
             outfile = deepcopy(lfn_in)
             if ctag != vtag:
                 self.log.debug('DEBUG %s -> %s',vtag, ctag)
-                while ctag in of:
+                while ctag in outfile:
                     outfile = outfile.replace(ctag,vtag)
 
             methods = ['simu:reco']

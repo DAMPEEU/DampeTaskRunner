@@ -217,7 +217,9 @@ class RecoRunner(Runner):
                 else:
                     self.jobs[job]=status
 
-
+        if not len(files):
+            self.log.info("found no files to submit this cycle, return")
+            return
 
         queue = self.batch.get("queue","short")
         memory= self.batch.get("mem","100Mb")

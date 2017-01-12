@@ -223,7 +223,7 @@ class RecoRunner(Runner):
                     self.log.debug("found %s already",outfile)
                     if verify:
                         if verifyDampeMC(outfile):
-                            self.log.info("verification of ROOT file successful, skipping")
+                            self.log.debug("verification of ROOT file successful, skipping")
                             skip = True
                             break
                         else:

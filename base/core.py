@@ -18,6 +18,8 @@ from yaml import load as yload
 from tempfile import NamedTemporaryFile
 from base.utils import sleep, basename, abstractmethod, verifyDampeMC, mkdir, isfile, extractVersionTag
 from base.batch import submit, queryJobs
+from base.utils import run as shell_call
+
 from XRootD import client
 
 class Runner(object):
@@ -85,6 +87,15 @@ class Runner(object):
     def initCycle(self):
         return
 
+    def getProxy(self):
+        proxy = self.batch.get("proxy",None)
+        if proxy is None: return True
+        rc, out, err = shell_call(proxy)
+        if rc:
+            self.log.error(str(err))
+            return False
+        return True
+
     def sleep(self):
         """ sleep for some time """
         st = self.daemon.get("sleeptime",300)
@@ -117,6 +128,7 @@ class Runner(object):
         """ this one executes stuff """
         while self.cycle < self.cycles:
             self.log.info("entering cycle %i/%i", self.cycle, self.cycles)
+            self.getProxy()
             self.initCycle()
             self.runCycle()
             if self.cycle > 1: self.flush()

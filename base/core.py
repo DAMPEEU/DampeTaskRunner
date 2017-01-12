@@ -141,7 +141,7 @@ class RecoRunner(Runner):
             while ctag in of:
                 of = of.replace(ctag,vtag)
 
-            print "DEBUG:" vtag, ctag, outfile, of
+            print "DEBUG:", vtag, ctag, outfile, of
 
             methods = ['simu:reco']
             assert method in methods, "have not implemented other methods yet, signal urgency to zimmer@cern.ch"

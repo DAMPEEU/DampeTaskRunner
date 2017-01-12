@@ -127,8 +127,8 @@ class RecoRunner(Runner):
 
 
         def infile2outfile(infile,target='xrootd',method='simu:reco'):
-            #vtag = getenv("DAMPE_VERSION_TAG","v5r3p0")
-            #ctag = extractVersionTag(infile)
+            vtag = getenv("DAMPE_VERSION_TAG","v5r3p0")
+            ctag = extractVersionTag(infile)
             lfn = infile
             server = ""
             if infile.startswith("root://"):
@@ -137,8 +137,11 @@ class RecoRunner(Runner):
             lfn_in = lfn
             outfile = deepcopy(lfn_in)
 
-            #while ctag in outfile:
-            #    outfile = outfile.replace(ctag,vtag)
+            of = deepcopy(outfile)
+            while ctag in of:
+                of = of.replace(ctag,vtag)
+
+            print "DEBUG:" vtag, ctag, outfile, of
 
             methods = ['simu:reco']
             assert method in methods, "have not implemented other methods yet, signal urgency to zimmer@cern.ch"
@@ -168,13 +171,13 @@ class RecoRunner(Runner):
                     target = 'xrootd'
                 outfile = infile2outfile(infile,target=target)
                 #print outfile
-                print 'after call: in2out ',base_dir, outfile
+                #print 'after call: in2out ',base_dir, outfile
                 if target == 'local':
                     outfile = "".join([base_dir,outfile])
                     while "//" in outfile:
                         outfile = outfile.replace("//","/")
                 outfilesF.append(outfile)
-                print 'before check',base_dir, outfile
+                #print 'before check',base_dir, outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)
                     if verify:
@@ -195,6 +198,7 @@ class RecoRunner(Runner):
             if len(files) >= maxfiles: break
             files.append((infile, outfilesF[0]))
             self.processed_files.append(infile)
+
         # query the job status
         jobs_in_batch = {}
         try:

@@ -225,7 +225,7 @@ class RecoRunner(Runner):
         chunks = array_split(array(files),nchunks)
 
         for i,chunk in enumerate(chunks):
-            self.log.debug(dict(chunk.tolist()))
+            #self.log.debug(dict(chunk.tolist()))
             tf = NamedTemporaryFile(dir=wd,delete=False)
             savetxt(tf.name,chunk,fmt="%s",header="chunk %i"%(i+1),delimiter=" ")
             self.log.debug("chunkfile: %s",tf.name)

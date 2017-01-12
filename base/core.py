@@ -10,6 +10,7 @@ from fnmatch import fnmatch
 from glob import glob
 from sys import exit as sys_exit
 from shutil import rmtree
+from getpass import getuser
 from os import environ, getenv, remove, chdir
 from os.path import abspath, isdir, join as opjoin
 from copy import deepcopy
@@ -72,6 +73,7 @@ class Runner(object):
         environ["DAMPE_PREREQUISITE_SCRIPT"]=self.software.get("externals_path","/tmp")
         environ["DAMPME_INSTALL_PATH"]=self.software.get("install_path","/tmp")
         environ["DAMPE_VERSION_TAG"]=self.software.get("version","v5r3p0")
+        environ["PBS_USER"] = self.batch.get("user",getuser())
         for key,value in self.software.get("env_vars",{}).iteritems():
             environ[key]=value
 

@@ -168,12 +168,13 @@ class RecoRunner(Runner):
                     target = 'xrootd'
                 outfile = infile2outfile(infile,target=target)
                 #print outfile
+                print 'after call: in2out ',base_dir, outfile
                 if target == 'local':
                     outfile = "".join([base_dir,outfile])
                     while "//" in outfile:
                         outfile = outfile.replace("//","/")
                 outfilesF.append(outfile)
-                print base_dir, outfile
+                print 'before check',base_dir, outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)
                     if verify:

@@ -101,6 +101,7 @@ class Runner(object):
 
     def flush(self,keepErrors=False):
         """ cleanup in each cycle! """
+        if not len(self.processed_files): return
         pattern = "{path}/{launcher}.*"
         if keepErrors:
             pattern = "{path}/*/{launcher}.o*"
@@ -116,9 +117,9 @@ class Runner(object):
         """ this one executes stuff """
         while self.cycle < self.cycles:
             self.log.info("entering cycle %i/%i", self.cycle, self.cycles)
-            self.flush()
             self.initCycle()
             self.runCycle()
+            if self.cycle > 1: self.flush()
             self.sleep()
             self.cycle += 1
         self.log.info("reached last cycle, start cleaning procedure")

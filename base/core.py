@@ -245,7 +245,6 @@ class RecoRunner(Runner):
             if self.dry:
                 self.log.info("running in DRY mode, do not submit anything.")
                 continue
-
             try:
                 jobId = submit(cmd)
             except Exception as err:
@@ -257,6 +256,7 @@ class RecoRunner(Runner):
     def initCycle(self):
         """ initialize each cycle """
         wd = self.task.get("workdir","/tmp/runner")
+        wd = opjoin(wd,"cycle_{i}".format(i=self.cycle))
         if isdir(wd):
             rmtree(wd)
         mkdir(wd)

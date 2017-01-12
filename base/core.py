@@ -28,6 +28,7 @@ class Runner(object):
     """
     def __init__(self,config=None):
         # some default values.
+        self.dry = False
         self.files_to_clean = []
         self.processed_files= []
         self.good = False
@@ -42,6 +43,9 @@ class Runner(object):
         self.log = logging.getLogger(self.__class__.__name__)
         self.config = config
         self.initialize()
+
+    def setDryRun(self):
+        self.dry = True
 
     def initialize(self):
         if self.config is None: raise RuntimeError("must intialize with config file, found None")
@@ -233,13 +237,15 @@ class RecoRunner(Runner):
                   " -l vmem={memory} {launcher}".format(launcher=self.launcher, queue=queue, memory=memory)
             self.log.info("submitting chunk %i/%i: %s",i+1, nchunks, cmd)
             jobId = -1
-            # try:
-            #     jobId = submit(cmd)
-            # except Exception as err:
-            #     self.log.error(str(err))
-            #     continue
-            # self.jobs[jobId]="Q"
-            # self.files_to_clean.append(abspath(tf.name))
+            if self.dry: return
+
+            try:
+                jobId = submit(cmd)
+            except Exception as err:
+                self.log.error(str(err))
+                continue
+            self.jobs[jobId]="Q"
+            self.files_to_clean.append(abspath(tf.name))
 
     def initCycle(self):
         """ initialize each cycle """

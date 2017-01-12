@@ -21,8 +21,10 @@ from base.logger import initLogger
 
 
 def main(argv=None):
-    def run(cfg, log, pidfile):
+    def run(cfg, log, pidfile, dry):
         reco = RecoRunner(config=cfg)
+        if dry:
+            reco.setDryRun()
         proc = Process(target=reco.execute)
         proc.start()
         log.info("started RecoRunner.")
@@ -41,6 +43,7 @@ def main(argv=None):
     parser.add_argument("-c","--config",dest='cfg',default=None,help='name of config.yaml file')
     parser.add_argument("-f","--force",action='store_true',default=False, help='re-execute runner even if running.')
     parser.add_argument("-D","--daemon",action='store_true',default=False, help='run in daemon mode')
+    parser.add_argument("-d","--dry",action='store_true',default=False, help='do not submit anything, good for testing')
     args = parser.parse_args()
     cfg = parse_config(args.cfg)
 
@@ -64,12 +67,12 @@ def main(argv=None):
     log = logging.getLogger("core")
 
     if not args.daemon:
-        run(args.cfg, log, pidfile)
+        run(args.cfg, log, pidfile, args.dry)
         remove(pidfile)
     else:
         log.info("running in daemon mode, will only terminate if pid file is removed")
         while isfile(pidfile):
-            run(args.cfg,log, pidfile)
+            run(args.cfg,log, pidfile, args.dry)
         log.info("PID file removed, shutting down daemon.")
 
 if __name__ == "__main__":

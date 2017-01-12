@@ -127,8 +127,8 @@ class RecoRunner(Runner):
 
 
         def infile2outfile(infile,target='xrootd',method='simu:reco'):
-            vtag = getenv("DAMPE_VERSION_TAG","v5r3p0")
-            ctag = extractVersionTag(infile)
+            #vtag = getenv("DAMPE_VERSION_TAG","v5r3p0")
+            #ctag = extractVersionTag(infile)
             lfn = infile
             server = ""
             if infile.startswith("root://"):
@@ -137,8 +137,8 @@ class RecoRunner(Runner):
             lfn_in = lfn
             outfile = deepcopy(lfn_in)
 
-            while ctag in outfile:
-                outfile = outfile.replace(ctag,vtag)
+            #while ctag in outfile:
+            #    outfile = outfile.replace(ctag,vtag)
 
             methods = ['simu:reco']
             assert method in methods, "have not implemented other methods yet, signal urgency to zimmer@cern.ch"

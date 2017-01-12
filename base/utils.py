@@ -18,10 +18,13 @@ log = logging.getLogger("utils")
 
 def extractVersionTag(lfn):
     """ returns the proper version tag from a long file."""
+    print 'extracting version tag'
     pattern = "v[0-9]+r[0-9]+p[0-9]+"
     match = None
+    print 'lfn: ',lfn
     for m in finditer(pattern,lfn):
         match = m
+        print match
     if match is None:
         raise Exception("could not find version tag.")
     return lfn[match.start():match.end()]

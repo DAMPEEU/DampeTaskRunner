@@ -2,7 +2,7 @@ import logging
 from time import sleep as time_sleep
 from psutil import AccessDenied, Process as psutil_proc
 from os import makedirs, utime
-from os.path import isfile as op_isfile, isdir
+from os.path import isfile as op_isfile, isdir, basename as op_basename
 from subprocess import PIPE, Popen
 from re import finditer
 
@@ -15,6 +15,7 @@ from ROOT import gROOT, TChain
 gROOT.ProcessLine("gErrorIgnoreLevel = 3002;")
 
 log = logging.getLogger("utils")
+
 
 def extractVersionTag(lfn):
     """ returns the proper version tag from a long file."""
@@ -32,9 +33,17 @@ def extractVersionTag(lfn):
     return tag
 
 
+def basename(lfn):
+    if lfn.startswith("root://"):
+        server = "root://{server}".format(server=lfn.split("/")[2])
+        lfn = lfn.replace(server,"")
+    return op_basename(lfn)
+
+
 def touch(path):
     with open(path, 'a'):
         utime(path, None)
+
 
 def mkdir(Dir):
     if Dir.startswith("root://"):
@@ -50,6 +59,7 @@ def mkdir(Dir):
     else:
         if not isdir(Dir):
             makedirs(Dir)
+
 
 def isfile(mpath,**kwargs):
     """ returns if file is present, and wraps xrootd protocol"""
@@ -73,7 +83,6 @@ def isfile(mpath,**kwargs):
         return op_isfile(mpath)
 
 
-
 def run(cmd):
     """
     :param cmd: command string to execute
@@ -88,6 +97,7 @@ def run(cmd):
         log.error(msg)
         raise RuntimeError(msg)
     return rc, output, error
+
 
 def verifyDampeMC(fn, ftype = 'reco'):
     """ open root file, check if branches are in there and if metdata is != 0, else return false """
@@ -107,6 +117,7 @@ def verifyDampeMC(fn, ftype = 'reco'):
         return False
     return True
 
+
 def abstractmethod(method):
     """
     An @abstractmethod member fn decorator.
@@ -118,6 +129,7 @@ def abstractmethod(method):
                                   + repr(method))
     default_abstract_method.__name__ = method.__name__
     return default_abstract_method
+
 
 def parse_sleep(sleep):
     MINUTE = 60
@@ -147,6 +159,7 @@ def parse_sleep(sleep):
     else:
         raise ValueError
 
+
 def sleep(sleep):
     return time_sleep(parse_sleep(sleep))
 
@@ -156,8 +169,10 @@ class ResourceMonitor(object):
     usertime = 0.
     systime = 0.
 
+
     def __init__(self):
         self.query()
+
 
     def query(self):
         from resource import getrusage, RUSAGE_SELF
@@ -166,6 +181,7 @@ class ResourceMonitor(object):
         self.systime = usage[1]
         # http://stackoverflow.com/questions/938733/total-memory-used-by-python-process
         self.memory = getrusage(RUSAGE_SELF).ru_maxrss * 1e-6  # mmemory in Mb
+
 
     def getMemory(self, unit='Mb'):
         self.query()
@@ -177,17 +193,21 @@ class ResourceMonitor(object):
             return float(self.memory) / 1024.
         return 0.
 
+
     def getCpuTime(self):
         self.query()
         return self.systime
+
 
     def getWallTime(self):
         self.query()
         return self.usertime
 
+
     def getEfficiency(self):
         self.query()
         return float(self.usertime) / float(self.systime)
+
 
     def __repr__(self):
         self.query()
@@ -199,6 +219,8 @@ class ResourceMonitor(object):
 
 class ProcessResourceMonitor(ResourceMonitor):
     # here we overload the init method to add a variable to the class
+
+
     def __init__(self, ps):
         if not isinstance(ps, psutil_proc):
             raise Exception("must be called from a psutil instance!")
@@ -208,6 +230,7 @@ class ProcessResourceMonitor(ResourceMonitor):
         self.debug = False
         self.ps = ps
         self.query()
+
 
     def getMemory(self, unit='Mb'):
         self.query()
@@ -219,17 +242,21 @@ class ProcessResourceMonitor(ResourceMonitor):
             return float(self.memory) / 1024.
         return 0.
 
+
     def getCpuTime(self):
         self.query()
         return self.user + self.system
 
+
     def queryResources(self):
         return "MEM: {memory} MB  -- CPU: {cpu} seconds".format(memory=self.getMemory(),cpu=self.getCpuTime())
+
 
     def free(self):
         self.user = 0
         self.system = 0
         self.memory = 0
+
 
     def query(self):
         dbg = self.debug
@@ -269,6 +296,7 @@ class ProcessResourceMonitor(ResourceMonitor):
         msg+= 'TOTAL this cycle: mem=%1.1f sys=%1.1f usr=%1.1f' % (self.memory, self.system, self.user)
         log.debug(msg)
         if dbg: print '**** DEBUG ****',msg
+
 
     def _getChildUsage(self, ps):
         if not isinstance(ps, psutil_proc):

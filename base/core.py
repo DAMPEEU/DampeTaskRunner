@@ -15,7 +15,7 @@ from os.path import abspath, isdir, join as opjoin
 from copy import deepcopy
 from yaml import load as yload
 from tempfile import NamedTemporaryFile
-from base.utils import sleep, abstractmethod, verifyDampeMC, mkdir, isfile, extractVersionTag
+from base.utils import sleep, basename, abstractmethod, verifyDampeMC, mkdir, isfile, extractVersionTag
 from base.batch import submit, queryJobs
 from XRootD import client
 
@@ -160,7 +160,10 @@ class RecoRunner(Runner):
         base_dirs = self.task.get("output_root",["/tmp"])
 
         for f in self.files_to_process:
-            if f in self.processed_files: continue
+            fname = basename(f)
+            if fname in self.processed_files:
+                self.log.debug("file already being processed.")
+                continue
             infile = f
             skip = False
             outfilesF = []
@@ -199,7 +202,7 @@ class RecoRunner(Runner):
             self.log.debug("FILE: %s -> %s", infile, outfilesF[0])
             if len(files) >= maxfiles: break
             files.append((infile, outfilesF[0]))
-            self.processed_files.append(infile)
+            self.processed_files.append(fname)
 
         # query the job status
         jobs_in_batch = {}

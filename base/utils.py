@@ -27,7 +27,9 @@ def extractVersionTag(lfn):
         print match
     if match is None:
         raise Exception("could not find version tag.")
-    return lfn[match.start():match.end()]
+    tag = lfn[match.start():match.end()]
+    print 'TAG: ',tag
+    return tag
 
 
 def touch(path):

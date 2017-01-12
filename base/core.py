@@ -328,7 +328,9 @@ class RecoRunner(Runner):
 
         if len(files_to_process):
             self.log.info("check input files")
-            for f in tqdm(files_to_process):
+            loop = files_to_process
+            if self.dry: loop = tqdm(loop)
+            for f in loop:
                 if f in self.processed_files: continue # skip
                 if isfile(f): self.files_to_process.append(f)
                 else:

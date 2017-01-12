@@ -136,10 +136,11 @@ class RecoRunner(Runner):
                 lfn = lfn.replace(server,"")
             lfn_in = lfn
             outfile = deepcopy(lfn_in)
-
+            print 'DEBUG {ctag} -> {vtag}'.format(vtag=vtag,ctag=ctag)
             of = deepcopy(outfile)
             while ctag in of:
                 of = of.replace(ctag,vtag)
+                print of
 
             print "DEBUG:", vtag, ctag, outfile, of
 

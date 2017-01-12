@@ -136,13 +136,10 @@ class RecoRunner(Runner):
                 lfn = lfn.replace(server,"")
             lfn_in = lfn
             outfile = deepcopy(lfn_in)
-            print 'DEBUG {ctag} -> {vtag}'.format(vtag=vtag,ctag=ctag)
-            of = deepcopy(outfile)
-            while ctag in of:
-                of = of.replace(ctag,vtag)
-                print of
-
-            print "DEBUG:", vtag, ctag, outfile, of
+            if ctag != vtag:
+                self.log.debug('DEBUG %s -> %s',vtag, ctag)
+                while ctag in of:
+                    outfile = outfile.replace(ctag,vtag)
 
             methods = ['simu:reco']
             assert method in methods, "have not implemented other methods yet, signal urgency to zimmer@cern.ch"

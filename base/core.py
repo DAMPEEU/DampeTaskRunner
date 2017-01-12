@@ -43,6 +43,13 @@ class Runner(object):
         self.log = logging.getLogger(self.__class__.__name__)
         self.config = config
         self.initialize()
+        self.workdir = None
+
+    def setWorkDir(self,wd):
+        if isdir(wd):
+            rmtree(wd)
+        mkdir(wd)
+        self.workdir = wd
 
     def setDryRun(self):
         self.dry = True
@@ -121,8 +128,7 @@ class RecoRunner(Runner):
 
     def runCycle(self):
         """ run in each cycle """
-        wd = self.task.get("workdir", "/tmp/runner")
-        chdir(wd)
+        chdir(self.workdir)
         # next, split list into chunks.
         nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
         nfiles  = self.task.get("max_files_per_job",10)
@@ -256,11 +262,9 @@ class RecoRunner(Runner):
     def initCycle(self):
         """ initialize each cycle """
         wd = self.task.get("workdir","/tmp/runner")
-        wd = opjoin(wd,"cycle_{i}".format(i=self.cycle))
-        if isdir(wd):
-            rmtree(wd)
-        mkdir(wd)
-        chdir(wd)
+        wd = opjoin(wd,"cycle_{i}".format(i=self.cycle+1))
+        self.setWorkDir(wd)
+        chdir(self.workdir)
         # need to fill files_to_process
         def lfn(parent,child,xc=None):
             if xc is None: return ""

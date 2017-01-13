@@ -192,9 +192,8 @@ class RecoRunner(Runner):
 
         files = []
         verify = self.task.get("verify_output",False)
-        self.log.info("Requested verification of input files prior to submitting jobs")
+        self.log.info("Requested verification of output files prior to submitting jobs")
         base_dirs = self.task.get("output_root",["/tmp"])
-
         for f in self.files_to_process:
             fname = basename(f)
             if fname in self.processed_files:
@@ -227,10 +226,10 @@ class RecoRunner(Runner):
                             skip = True
                             break
                         else:
-                            self.log.info("verification of ROOT file failed")
+                            self.log.debug("verification of ROOT file failed")
                             continue # move on to 2nd method.
                     else:
-                        self.log.info("skipping verification, skipping file.")
+                        self.log.debug("skipping verification, skipping file.")
                         skip = True
                         break
             if skip: continue

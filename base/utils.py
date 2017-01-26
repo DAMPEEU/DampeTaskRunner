@@ -21,6 +21,8 @@ def extractVersionTag(lfn):
     """ returns the proper version tag from a long file."""
     #print 'extracting version tag'
     pattern = "v[0-9]+r[0-9]+p[0-9]+"
+    if "trunk" in lfn:
+        pattern = "trunk-r[0-9]+"
     match = None
     #print 'lfn: ',lfn
     for m in finditer(pattern,lfn):
@@ -29,6 +31,8 @@ def extractVersionTag(lfn):
     if match is None:
         raise Exception("could not find version tag.")
     tag = lfn[match.start():match.end()]
+    # drop beta...
+    if 'b' in tag: tag = tag.replace("b","")
     #print 'TAG: ',tag
     return tag
 

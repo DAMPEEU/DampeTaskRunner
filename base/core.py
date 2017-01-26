@@ -301,10 +301,13 @@ class RecoRunner(Runner):
 
         files_to_process = []
         pattern = self.task.get("pattern","*")
+        if not isinstance(pattern,list):
+            pattern = [pattern]
         base_dir = self.task.get("input_root","/tmp")
         if not base_dir.startswith("@XROOTD:BASEDIR"):
             self.log.info("processing local files")
-            files_to_process = [abspath(f) for f in glob("{base}/{pattern}/*.root".format(base=base_dir,pattern=pattern))]
+            for p in pattern:
+                files_to_process += [abspath(f) for f in glob("{base}/{pattern}/*.root".format(base=base_dir,pattern=p))]
         else:
             self.log.info("processing remote files")
             server = "root://{server}:{port}".format(server=self.storage.get("server","localhost"),
@@ -318,7 +321,9 @@ class RecoRunner(Runner):
                 self.log.error(is_ok.message)
                 return
             else:
-                tasks = [opjoin(folders.parent,entry.name) for entry in folders.dirlist if fnmatch(entry.name,pattern)]
+                tasks = []
+                for p in pattern:
+                    tasks += [opjoin(folders.parent,entry.name) for entry in folders.dirlist if fnmatch(entry.name,p)]
                 self.log.info("found %i tasks, querying for files.",len(tasks))
                 loop = enumerate(tasks)
                 if self.dry: loop = tqdm(loop)

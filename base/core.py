@@ -17,9 +17,8 @@ from copy import deepcopy
 from yaml import load as yload
 from tempfile import NamedTemporaryFile
 from base.utils import sleep, basename, abstractmethod, verifyDampeMC, mkdir, isfile, extractVersionTag
-from base.batch import submit, queryJobs
 from base.utils import run as shell_call
-
+from importlib import import_module
 from XRootD import client
 
 class Runner(object):
@@ -75,9 +74,17 @@ class Runner(object):
         environ["DAMPE_PREREQUISITE_SCRIPT"]=self.software.get("externals_path","/tmp")
         environ["DAMPME_INSTALL_PATH"]=self.software.get("install_path","/tmp")
         environ["DAMPE_VERSION_TAG"]=self.software.get("version","v5r3p0")
-        environ["PBS_USER"] = self.batch.get("user",getuser())
+        self.batch_system = self.batch.get("system","default")
+        if self.batch_system == 'default':
+            self.log.info("found no keyword for batch:system, assume default (PBS)")
+            self.batch_system = 'pbs'
+        assert self.batch_system in ['pbs','slurm'], "unsupported batch system"
+        self.hpc = import_module("base.batch.%s" % self.batch_system)
+        self.hpc.setSubmitter(self.batch.get("submit_command","None"))
+        self.hpc.setUser(self.batch.get("user",getuser()))
         for key,value in self.software.get("env_vars",{}).iteritems():
             environ[key]=value
+
 
     @abstractmethod
     def runCycle(self):
@@ -242,12 +249,12 @@ class RecoRunner(Runner):
         # query the job status
         jobs_in_batch = {}
         try:
-            jobs_in_batch = queryJobs()
+            jobs_in_batch = self.hpc.queryJobs()
         except Exception as err:
             self.log.error(str(err))
         for job,status in jobs_in_batch.iteritems():
             if job in self.jobs.keys():
-                if status == "C":
+                if status in self.hpc.getFinalStatii():
                     del self.jobs[job]
                 else:
                     self.jobs[job]=status
@@ -256,7 +263,6 @@ class RecoRunner(Runner):
             self.log.info("found no files to submit this cycle, return")
             return
 
-        queue = self.batch.get("queue","short")
         memory= self.batch.get("mem","100Mb")
 
         chunks = array_split(array(files),nchunks)
@@ -272,20 +278,31 @@ class RecoRunner(Runner):
             environ["EXEC_DIR_ROOT"] = "/tmp"
             environ["DAMPECOMMAND"] = full_cmd
             environ["FILES_TO_CLEANUP"]=abspath(tf.name)
-            cmd = "qsub -q {queue} -v DAMPE_PREREQUISITE_SCRIPT,DAMPE_LOGLEVEL,EXEC_DIR_ROOT" \
-                  ",TMP_INPUT,INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND,CUSTOM_SLEEP -l mem={memory}" \
-                  " -l vmem={memory} {launcher}".format(launcher=self.launcher, queue=queue, memory=memory)
-            self.log.info("submitting chunk %i/%i: %s",i+1, nchunks, cmd)
+
+            my_env_keys = "DAMPE_PREREQUISITE_SCRIPT,DAMPE_LOGLEVEL,EXEC_DIR_ROOT,TMP_INPUT,"\
+                          "INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND,CUSTOM_SLEEP"
+
+            my_env = {key:getenv(key) for key in my_env_keys.split(",")}
+
+            my_dict = dict(env=my_env, executable=self.launcher, memory=memory)
+            if self.batch_system == "pbs":
+                my_dict["queue"]=self.batch.get("queue","short")
+            elif self.batch_system=="slurm":
+                my_dict["cpu"]=self.batch.get("cpu","1440")
+            else:
+                raise NotImplementedError("currently only supported batch systems are: PBS, SLURM")
+
             jobId = -1
-            if self.dry:
-                self.log.info("running in DRY mode, do not submit anything.")
-                continue
             try:
-                jobId = submit(cmd)
+                self.log.info("submitting chunk %i/%i: ", i + 1, nchunks)
+                jobId = self.hpc.submit(dry=self.dry,verbose=True,**my_dict)
+                if self.dry:
+                    self.log.info("running in DRY mode, do not submit anything.")
+                    continue
             except Exception as err:
                 self.log.error(str(err))
                 continue
-            self.jobs[jobId]="Q"
+            self.jobs[jobId]="Q" if self.batch_system == "pbs" else "PD"
             self.log.info("submitted job %s",jobId)
 
     def initCycle(self):

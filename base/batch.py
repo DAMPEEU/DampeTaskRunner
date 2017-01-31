@@ -9,7 +9,6 @@ from base.utils import run as __run__
 
 log = logging.getLogger("batch")
 
-
 class hpc(object):
     user = None
     final_statii = []
@@ -31,12 +30,17 @@ class hpc(object):
     def setUser(self,usr):
         self.user = usr
 
-    def __submit__(self,cmd):
+    def __submit__(self,cmd,dry=False,verbose=True):
         """ convenience method to wrap batch submission, will return jobID"""
+        if verbose:
+            self.log.info("bash: %s",cmd)
+        if dry:
+            self.log.info("running in DRY mode, do not submit anything.")
+            return -1
         rc, output, error = __run__(cmd)
         if rc:
             raise RuntimeError(error)
-        return __regexId__(output)
+        return self.__regexId__(output)
 
 class pbs(hpc):
     final_statii = ["C"]
@@ -79,13 +83,7 @@ class pbs(hpc):
             " -l vmem={memory} {executable}".format(sub=self.executor,queue=queue,
                                                     env=",".join(env.keys()),
                                                     memory=memory,executable=executable)
-        if verbose:
-            print cmd
-
-        if dry:
-            return
-        else:
-            return self.__submit__(cmd)
+        return self.__submit__(cmd,verbose=verbose,dry=dry)
 
 class slurm(hpc):
     final_statii = ["CA","F","TO","CD","SE"]
@@ -107,8 +105,7 @@ class slurm(hpc):
             for line in lines[1:-1]:
                 while "\n" in line: line = line.replace("\n","")
                 jobId, status = line.split()
-                jobId= self.__regexId__(jobId)
-                jobs[jobId] = status
+                jobs[int(jobId)] = status
         return jobs
 
     def submit(self,**kwargs):
@@ -130,10 +127,4 @@ class slurm(hpc):
                                                                                 env=",".join(env.keys()),
                                                                                 memory=memory, cpu=cpu,
                                                                                 executable=executable)
-        if verbose:
-            print cmd
-
-        if dry:
-            return
-        else:
-            return self.__submit__(cmd)
+        return self.__submit__(cmd,verbose=verbose,dry=dry)

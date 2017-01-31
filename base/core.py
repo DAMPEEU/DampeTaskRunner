@@ -296,9 +296,7 @@ class RecoRunner(Runner):
             try:
                 self.log.info("submitting chunk %i/%i: ", i + 1, nchunks)
                 jobId = self.hpc.submit(dry=self.dry,verbose=True,**my_dict)
-                if self.dry:
-                    self.log.info("running in DRY mode, do not submit anything.")
-                    continue
+                if self.dry: continue
             except Exception as err:
                 self.log.error(str(err))
                 continue

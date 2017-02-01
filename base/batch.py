@@ -5,6 +5,7 @@
 import logging
 from re import findall
 from os import getenv, environ
+from os.path import abspath
 from base.utils import run as __run__
 
 log = logging.getLogger("batch")
@@ -125,7 +126,8 @@ class slurm(hpc):
             environ[key]=value
 
         if cpu == 0.: raise Exception("must provide cpu time")
-        cmd="{sub} -t {cpu} --mem={memory} --export={env} {executable}".format(sub=self.executor,
+        cmd="{sub} -t {cpu} --mem={memory} --export={env} --workdir={wd} {executable}".format(sub=self.executor,
+                                                                                wd=abspath("."),
                                                                                 env=",".join(env.keys()),
                                                                                 memory=memory, cpu=cpu,
                                                                                 executable=executable)

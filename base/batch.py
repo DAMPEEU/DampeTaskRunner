@@ -12,6 +12,7 @@ log = logging.getLogger("batch")
 class hpc(object):
     user = None
     final_statii = []
+
     def __regexId__(self,_str):
         """ returns the batch Id using some regular expression, pbs specific """
         # default:

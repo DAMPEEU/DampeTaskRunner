@@ -12,7 +12,7 @@ log = logging.getLogger("batch")
 class hpc(object):
     user = None
     final_statii = []
-
+    executor = None
     def __regexId__(self,_str):
         """ returns the batch Id using some regular expression, pbs specific """
         # default:
@@ -45,6 +45,7 @@ class hpc(object):
 
 class pbs(hpc):
     final_statii = ["C"]
+    executor = "bsub"
     def queryJobs(self):
         """ returns a dict of jobs and status """
         jobs = {}
@@ -88,7 +89,7 @@ class pbs(hpc):
 
 class slurm(hpc):
     final_statii = ["CA","F","TO","CD","SE"]
-
+    executor = "sbatch"
     def queryJobs(self):
         """ returns a dict of jobs and status """
         jobs = {}

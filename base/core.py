@@ -80,7 +80,8 @@ class Runner(object):
             self.batch_system = 'pbs'
         assert self.batch_system in ['pbs','slurm'], "unsupported batch system"
         self.hpc = import_module("base.batch.%s" % self.batch_system)
-        self.hpc.setSubmitter(self.batch.get("submit_command","None"))
+        executor = self.batch.get("submit_command","None")
+        if executor != "None": self.hpc.setSubmitter(executor)
         self.hpc.setUser(self.batch.get("user",getuser()))
         for key,value in self.software.get("env_vars",{}).iteritems():
             environ[key]=value

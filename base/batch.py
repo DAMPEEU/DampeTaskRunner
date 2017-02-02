@@ -135,18 +135,18 @@ class slurm(hpc):
         if cpu == 0.: raise Exception("must provide cpu time")
 
         sscript = NamedTemporaryFile(dir=wd,suffix=".sh",mode="w",delete=False)
+        sname = abspath(sscript.name)
         sscript.write("#!/bin/sh\n")
         sscript.write("#SBATCH --ntasks=1\n")
         sscript.write("#SBATCH --partition={part}\n".format(part=part))
-        sscript.write("#SBATCH -e {exe}.err\n".format(exe=executable))
-        sscript.write("#SBATCH -o {exe}.out\n".format(exe=executable))
+        sscript.write("#SBATCH -e {exe}.err\n".format(exe=sname))
+        sscript.write("#SBATCH -o {exe}.out\n".format(exe=sname))
         sscript.write("#SBATCH --time={cpu}\n#SBATCH --mem={mem}\n\n".format(cpu=cpu,mem=memory))
         for key, value in env.iteritems():
             environ[key]=value
             sscript.write("sbatch --export={key} # {value}\n".format(key=key,value=value))
         sscript.write("\nsrun bash {executable}\n".format(executable=executable))
         sscript.close()
-        sname=abspath(sscript.name)
         chmod(sname,0o755)
         chdir(dirname(sname))
         cmd="{sub} ./{fn}".format(sub=self.executor,fn=basename(sname))

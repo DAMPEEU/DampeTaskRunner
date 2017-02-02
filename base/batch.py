@@ -140,7 +140,7 @@ class slurm(hpc):
         sscript.write("#SBATCH --time={cpu}\n#SBATCH --mem={mem}\n\n".format(cpu=cpu,mem=memory))
         for key, value in env.iteritems():
             environ[key]=value
-            sscript.write("sbatch --export={key}\n".format(key=key))
+            sscript.write("sbatch --export={key} # {value}\n".format(key=key,value=value))
         sscript.write("\nsrun bash {executable}\n".format(executable=executable))
         sscript.close()
         sname=abspath(sscript.name)

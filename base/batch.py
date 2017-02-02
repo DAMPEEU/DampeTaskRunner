@@ -106,10 +106,11 @@ class slurm(hpc):
             lines = lines[1:-1]
             for line in lines[1:-1]:
                 while "\n" in line: line = line.replace("\n","")
-                my_line = line.split()
+                my_line = line.split(" ")
                 log.error(str(my_line))
-                jobId, status = my_line[0],my_line[3]
-                jobs[int(jobId)] = status
+                jobId, status = int(my_line[0]),my_line[3]
+                while " " in status: status = status.replace(" ","")
+                jobs[jobId] = status
         return jobs
 
     def submit(self,**kwargs):

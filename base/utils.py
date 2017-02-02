@@ -96,7 +96,7 @@ def run(cmd):
     :param cmd: command string to execute
     :return: return code, stderr, stdout
     """
-    tsk = Popen(cmd.split(), stdout=PIPE, stderr=PIPE)#, shell=True)
+    tsk = Popen(cmd.split(), stdout=PIPE, stderr=PIPE, shell=True)
     rc = tsk.wait()
     output = tsk.stdout.read()
     error = tsk.stderr.read()

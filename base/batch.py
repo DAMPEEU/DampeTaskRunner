@@ -93,18 +93,13 @@ class slurm(hpc):
     def queryJobs(self):
         """ returns a dict of jobs and status """
         jobs = {}
-        cmd = "squeue -u {user} -o \"%A %t\"".format(user=self.user)
+        cmd = "squeue -u {user} ".format(user=self.user)
         log.error("**DEBUG** status cmd: %s",cmd)
-        try:
-            rc, output, error = __run__(cmd)
-        except:
-            log.exception("exception trying to run command")
-            raise
+        rc, output, error = __run__(cmd)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
             log.error(msg)
             raise Exception(msg)
-        log.critical(output)
         lines = output.split("\n")
         if len(lines) == 1: jobs = {}
         else:
@@ -112,8 +107,8 @@ class slurm(hpc):
             log.critical("%s",str(lines))
             for line in lines[1:-1]:
                 while "\n" in line: line = line.replace("\n","")
-                jobId, status = line.split()
-                log.critical('jobId: %i, status: %s',jobId,status)
+                my_line = line.split()
+                jobId, status = my_line[0],my_line[3]
                 jobs[int(jobId)] = status
         return jobs
 

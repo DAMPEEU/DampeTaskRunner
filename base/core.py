@@ -286,7 +286,7 @@ class RecoRunner(Runner):
                           "INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND"
 
             my_env = {key:str(getenv(key)) for key in my_env_keys.split(",")}
-            my_env['CUSTOM_SLEEP']str(randint(0,30))
+            my_env['CUSTOM_SLEEP']=str(randint(0,30))
 
 
             my_dict = dict(env=my_env, executable=self.launcher, memory=memory)

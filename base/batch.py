@@ -137,9 +137,7 @@ class slurm(hpc):
         sscript.write("#!/bin/sh\n")
         sscript.write("#SBATCH -e {exe}.err\n".format(exe=executable))
         sscript.write("#SBATCH -o {exe}.out\n".format(exe=executable))
-        sscript.write("#SBATCH --time={cpu}\n#SBATCH --mem={mem}\nexport SLURM_SUBMIT_DIR={wd}\n".format(cpu=cpu,
-                                                                                                       mem=memory,
-                                                                                                       wd=wd))
+        sscript.write("#SBATCH --time={cpu}\n#SBATCH --mem={mem}\n\n".format(cpu=cpu,mem=memory))
         for key, value in env.iteritems():
             environ[key]=value
             sscript.write("sbatch --export={key}\n".format(key=key))

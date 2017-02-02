@@ -8,7 +8,7 @@ from os import getenv, environ
 from os.path import abspath
 from base.utils import run as __run__
 
-log = logging.getLogger("batch")
+log = logging.getLogger("core")
 
 class hpc(object):
     user = None
@@ -94,8 +94,7 @@ class slurm(hpc):
         """ returns a dict of jobs and status """
         jobs = {}
         cmd = "squeue -u {user} -o \"%%A %%t\"".format(user=self.user)
-        print cmd
-        #log.info("**DEBUG** status cmd: %s",cmd)
+        log.error("**DEBUG** status cmd: %s",cmd)
         rc, output, error = __run__(cmd)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)

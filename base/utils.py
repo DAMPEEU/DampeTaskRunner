@@ -88,9 +88,7 @@ def isfile(mpath,**kwargs):
 
 def make_executable(path):
     #http://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
-    mode = stat(path).st_mode
-    mode |= (mode & 0o444) >> 2    # copy R bits to X
-    chmod(path, mode)
+    chmod(path,0755)
 
 def run(cmd,shell=False):
     """

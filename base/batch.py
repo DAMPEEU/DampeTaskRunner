@@ -4,9 +4,9 @@
 """
 import logging
 from re import findall
-from os import getenv, environ
+from os import getenv, environ, chmod
 from os.path import abspath
-from base.utils import make_executable, run as __run__
+from base.utils import run as __run__
 from tempfile import NamedTemporaryFile
 
 log = logging.getLogger("core")
@@ -147,6 +147,6 @@ class slurm(hpc):
         sscript.write("\nsrun bash {executable}\n".format(executable=executable))
         sscript.close()
         sname=abspath(sscript.name)
-        make_executable(sname)
+        chmod(sname,0o755)
         cmd="{sub} .{fn}".format(sub=self.executor,fn=sname)
         return self.__submit__(cmd,verbose=verbose,dry=dry)

@@ -6,6 +6,7 @@ Created on Jan 9, 2017
 import logging
 from numpy import array, array_split, savetxt
 from tqdm import tqdm
+from random import randint
 from fnmatch import fnmatch
 from glob import glob
 from sys import exit as sys_exit
@@ -281,6 +282,7 @@ class RecoRunner(Runner):
             environ["EXEC_DIR_ROOT"] = "/tmp"
             environ["DAMPECOMMAND"] = full_cmd
             environ["FILES_TO_CLEANUP"]=abspath(tf.name)
+            environ['CUSTOM_SLEEP']=randint(0,30)
 
             my_env_keys = "DAMPE_PREREQUISITE_SCRIPT,DAMPE_LOGLEVEL,EXEC_DIR_ROOT,TMP_INPUT,"\
                           "INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND,CUSTOM_SLEEP"

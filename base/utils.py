@@ -1,7 +1,7 @@
 import logging
 from time import sleep as time_sleep
 from psutil import AccessDenied, Process as psutil_proc
-from os import makedirs, utime
+from os import makedirs, utime, stat, chmod
 from os.path import isfile as op_isfile, isdir, basename as op_basename
 from subprocess import PIPE, Popen
 from re import finditer
@@ -86,10 +86,11 @@ def isfile(mpath,**kwargs):
     else:
         return op_isfile(mpath)
 
-
-
-
-
+def make_executable(path):
+    #http://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
+    mode = stat(path).st_mode
+    mode |= (mode & 0o444) >> 2    # copy R bits to X
+    chmod(path, mode)
 
 def run(cmd,shell=False):
     """

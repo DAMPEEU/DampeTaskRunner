@@ -79,7 +79,7 @@ class Runner(object):
             self.log.info("found no keyword for batch:system, assume default (PBS)")
             self.batch_system = 'pbs'
         assert self.batch_system in ['pbs','slurm'], "unsupported batch system"
-        self.hpc = eval("%s"%self.batch_system)
+        self.hpc = eval("%s()"%self.batch_system)
         executor = self.batch.get("submit_command","None")
         if executor != "None": self.hpc.setSubmitter(executor)
         self.hpc.setUser(self.batch.get("user",getuser()))

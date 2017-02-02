@@ -300,7 +300,7 @@ class RecoRunner(Runner):
             jobId = -1
             try:
                 self.log.info("submitting chunk %i/%i: ", i + 1, nchunks)
-                jobId = self.hpc.submit(dry=self.dry,verbose=True,workdir=self.workdir,**my_dict,)
+                jobId = self.hpc.submit(dry=self.dry,verbose=True,workdir=self.workdir,**my_dict)
                 if self.dry: continue
             except Exception as err:
                 self.log.error(str(err))

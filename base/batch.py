@@ -96,6 +96,7 @@ class slurm(hpc):
         jobs = {}
         usr = getenv("PBS_USER", "user")
         cmd = 'squeue -u {user} -o "%A %t" '.format(user=usr)
+        log.info("**DEBUG** status cmd: %s",cmd)
         rc, output, error = __run__(cmd)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)

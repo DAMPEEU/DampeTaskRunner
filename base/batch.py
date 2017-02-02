@@ -128,18 +128,22 @@ class slurm(hpc):
         cpu         = kwargs.get("cpu",0.)
         dry         = bool(kwargs.get("dry",False))
         verbose     = bool(kwargs.get("verbose",True))
+        wd          = str(kwargs.get("workdir","$(pwd)"))
         log.error("ENV SETTINGS: %s",str(env))
-        for key,value in env.iteritems():
-            environ[key]=value
 
         if cpu == 0.: raise Exception("must provide cpu time")
 
         sscript = NamedTemporaryFile(dir=wd,delete=False)
         sscript.write("#!/bin/sh\n")
+        sscript.write("#SBATCH -e {exe}.err\n".format(exe=executable))
+        sscript.write("#SBATCH -o {exe}.out\n".format(exe=executable))
         sscript.write("#SBATCH --time={cpu}\n#SBATCH --mem={mem}\nexport SLURM_SUBMIT_DIR={wd}\n".format(cpu=cpu,
                                                                                                        mem=memory,
                                                                                                        wd=wd))
-        sscript.write("srun .{executable}".format(executable=executable))
+        for key, value in env.iteritems():
+            environ[key]=value
+            sscript.write("sbatch --export={key}\n".format(key=key))
+        sscript.write("\nsrun .{executable}".format(executable=executable))
         sscript.close()
         sname=abspath(sscript.name)
 

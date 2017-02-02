@@ -282,12 +282,12 @@ class RecoRunner(Runner):
             environ["EXEC_DIR_ROOT"] = "/tmp"
             environ["DAMPECOMMAND"] = full_cmd
             environ["FILES_TO_CLEANUP"]=abspath(tf.name)
-            environ['CUSTOM_SLEEP']=randint(0,30)
-
             my_env_keys = "DAMPE_PREREQUISITE_SCRIPT,DAMPE_LOGLEVEL,EXEC_DIR_ROOT,TMP_INPUT,"\
-                          "INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND,CUSTOM_SLEEP"
+                          "INPUTFILE,DAMPME_INSTALL_PATH,DAMPECOMMAND"
 
-            my_env = {key:getenv(key) for key in my_env_keys.split(",")}
+            my_env = {key:str(getenv(key)) for key in my_env_keys.split(",")}
+            my_env['CUSTOM_SLEEP']str(randint(0,30))
+
 
             my_dict = dict(env=my_env, executable=self.launcher, memory=memory)
             if self.batch_system == "pbs":

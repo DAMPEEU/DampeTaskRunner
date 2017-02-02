@@ -18,7 +18,7 @@ from yaml import load as yload
 from tempfile import NamedTemporaryFile
 from base.utils import sleep, basename, abstractmethod, verifyDampeMC, mkdir, isfile, extractVersionTag
 from base.utils import run as shell_call
-from importlib import import_module
+from base.batch import slurm, pbs
 from XRootD import client
 
 class Runner(object):
@@ -79,7 +79,7 @@ class Runner(object):
             self.log.info("found no keyword for batch:system, assume default (PBS)")
             self.batch_system = 'pbs'
         assert self.batch_system in ['pbs','slurm'], "unsupported batch system"
-        self.hpc = import_module("base.batch.%s" % self.batch_system)
+        self.hpc = eval("%s"%self.batch_system)
         executor = self.batch.get("submit_command","None")
         if executor != "None": self.hpc.setSubmitter(executor)
         self.hpc.setUser(self.batch.get("user",getuser()))

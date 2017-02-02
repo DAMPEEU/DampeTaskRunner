@@ -4,8 +4,8 @@
 """
 import logging
 from re import findall
-from os import getenv, environ, chmod
-from stat import S_IEXEC
+from os import getenv, environ, chmod, stat
+from stat import S_IEXEC, S_IXGRP, S_IXOTH
 from os.path import abspath
 from base.utils import run as __run__
 from tempfile import NamedTemporaryFile
@@ -148,6 +148,7 @@ class slurm(hpc):
         sscript.write("\nsrun bash {executable}\n".format(executable=executable))
         sscript.close()
         sname=abspath(sscript.name)
-        chmod(sname,S_IEXEC)
+        perm = stat(sname)
+        chmod(sname,perm.st_mode | S_IEXEC)
         cmd="{sub} .{fn}".format(sub=self.executor,fn=sname)
         return self.__submit__(cmd,verbose=verbose,dry=dry)

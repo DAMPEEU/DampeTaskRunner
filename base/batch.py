@@ -111,6 +111,8 @@ class slurm(hpc):
                 jobId = my_line[0]
                 if "_" in jobId: jobId = int(jobId.split("_")[0])
                 status = my_line[4]
+                user   = my_line[3]
+                if not user == self.user: continue
                 while " " in status: status = status.replace(" ","")
                 jobs[jobId] = status
         return jobs

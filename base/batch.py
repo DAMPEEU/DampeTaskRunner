@@ -107,12 +107,12 @@ class slurm(hpc):
             for line in lines[1:-1]:
                 while "\n" in line: line = line.replace("\n","")
                 my_line = [f for f in line.split(" ") if not f == ""]
-                log.error(str(my_line))
                 jobId = my_line[0]
                 if "_" in jobId: jobId = int(jobId.split("_")[0])
                 status = my_line[4]
                 user   = my_line[3]
                 if not user == self.user: continue
+                log.error(str(my_line))
                 while " " in status: status = status.replace(" ","")
                 jobs[jobId] = status
         return jobs
@@ -137,4 +137,5 @@ class slurm(hpc):
                                                                                 env=",".join(env.keys()),
                                                                                 memory=memory, cpu=cpu,
                                                                                 executable=executable)
+        log.info(cmd)
         return self.__submit__(cmd,verbose=verbose,dry=dry)

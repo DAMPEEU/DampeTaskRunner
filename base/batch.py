@@ -146,5 +146,5 @@ class slurm(hpc):
         sscript.close()
         sname=abspath(sscript.name)
         chmod(sname,S_IEXEC)
-        cmd="{sub} ./{fn}".format(sub=self.executor,fn=sname)
+        cmd="{sub} .{fn}".format(sub=self.executor,fn=sname)
         return self.__submit__(cmd,verbose=verbose,dry=dry)

@@ -134,7 +134,7 @@ class slurm(hpc):
 
         if cpu == 0.: raise Exception("must provide cpu time")
 
-        sscript = NamedTemporaryFile(dir=wd,delete=False)
+        sscript = NamedTemporaryFile(dir=wd,suffix=".sh",delete=False)
         sscript.write("#!/bin/sh\n")
         sscript.write("#SBATCH --ntasks=1\n")
         sscript.write("#SBATCH --partition={part}\n".format(part=part))

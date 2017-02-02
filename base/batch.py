@@ -93,7 +93,8 @@ class slurm(hpc):
     def queryJobs(self):
         """ returns a dict of jobs and status """
         jobs = {}
-        cmd = 'squeue -u {user} -o "%A %t" '.format(user=self.user)
+        cmd = "squeue -u {user} -o \"\%A \%t\"".format(user=self.user)
+        print cmd
         #log.info("**DEBUG** status cmd: %s",cmd)
         rc, output, error = __run__(cmd)
         if rc:

@@ -127,7 +127,7 @@ class slurm(hpc):
         cpu         = kwargs.get("cpu",0.)
         dry         = bool(kwargs.get("dry",False))
         verbose     = bool(kwargs.get("verbose",True))
-
+        log.error("ENV SETTINGS: %s",str(env))
         for key,value in env.iteritems():
             environ[key]=value
 

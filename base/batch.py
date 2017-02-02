@@ -7,6 +7,7 @@ from re import findall
 from os import getenv, environ
 from os.path import abspath
 from base.utils import run as __run__
+from tempfile import NamedTemporaryFile
 
 log = logging.getLogger("core")
 
@@ -132,9 +133,15 @@ class slurm(hpc):
             environ[key]=value
 
         if cpu == 0.: raise Exception("must provide cpu time")
-        cmd="{sub} -t {cpu} --mem={memory} --export={env} --workdir={wd} {executable}".format(sub=self.executor,
-                                                                                wd=abspath("."),
-                                                                                env=",".join(env.keys()),
-                                                                                memory=memory, cpu=cpu,
-                                                                                executable=executable)
+
+        sscript = NamedTemporaryFile(dir=wd,delete=False)
+        sscript.write("#!/bin/sh\n")
+        sscript.write("#SBATCH --time={cpu}\n#SBATCH --mem={mem}\nexport SLURM_SUBMIT_DIR={wd}\n".format(cpu=cpu,
+                                                                                                       mem=memory,
+                                                                                                       wd=wd))
+        sscript.write("srun .{executable}".format(executable=executable))
+        sscript.close()
+        sname=abspath(sscript.name)
+
+        cmd="{sub} {fn}".format(sub=self.executor,fn=sname)
         return self.__submit__(cmd,verbose=verbose,dry=dry)

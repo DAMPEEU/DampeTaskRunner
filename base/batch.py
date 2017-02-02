@@ -130,12 +130,15 @@ class slurm(hpc):
         dry         = bool(kwargs.get("dry",False))
         verbose     = bool(kwargs.get("verbose",True))
         wd          = str(kwargs.get("workdir","$(pwd)"))
+        part        = str(kwargs.get("partition","debug"))
         log.error("ENV SETTINGS: %s",str(env))
 
         if cpu == 0.: raise Exception("must provide cpu time")
 
         sscript = NamedTemporaryFile(dir=wd,delete=False)
         sscript.write("#!/bin/sh\n")
+        sscript.write("#SBATCH --ntasks=1\n")
+        sscript.write("#SBATCH --partition={part}\n".format(part=part))
         sscript.write("#SBATCH -e {exe}.err\n".format(exe=executable))
         sscript.write("#SBATCH -o {exe}.out\n".format(exe=executable))
         sscript.write("#SBATCH --time={cpu}\n#SBATCH --mem={mem}\n\n".format(cpu=cpu,mem=memory))

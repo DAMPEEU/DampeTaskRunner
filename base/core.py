@@ -294,6 +294,7 @@ class RecoRunner(Runner):
                 my_dict["queue"]=self.batch.get("queue","short")
             elif self.batch_system=="slurm":
                 my_dict["cpu"]=self.batch.get("cpu","1440")
+                my_dict["partition"]=self.batch.get("partition","debug")
             else:
                 raise NotImplementedError("currently only supported batch systems are: PBS, SLURM")
 

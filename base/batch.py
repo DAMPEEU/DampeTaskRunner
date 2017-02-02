@@ -36,9 +36,9 @@ class hpc(object):
     def __submit__(self,cmd,dry=False,verbose=True):
         """ convenience method to wrap batch submission, will return jobID"""
         if verbose:
-            log.critical("bash: %s",cmd)
+            log.info("bash: %s",cmd)
         if dry:
-            log.info("running in DRY mode, do not submit anything.")
+            log.warning("running in DRY mode, do not submit anything.")
             return -1
         rc, output, error = __run__(cmd)
         if rc:
@@ -95,7 +95,7 @@ class slurm(hpc):
         """ returns a dict of jobs and status """
         jobs = {}
         cmd = "squeue -u {user} ".format(user=self.user)
-        log.error("**DEBUG** status cmd: %s",cmd)
+        #log.error("**DEBUG** status cmd: %s",cmd)
         rc, output, error = __run__(cmd,shell=True)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
@@ -113,7 +113,7 @@ class slurm(hpc):
                 status = my_line[4]
                 user   = str(my_line[3])
                 if user != self.user: continue
-                log.error(str(my_line))
+                #log.error(str(my_line))
                 while " " in status: status = status.replace(" ","")
                 jobs[jobId] = status
         return jobs
@@ -130,7 +130,7 @@ class slurm(hpc):
         verbose     = bool(kwargs.get("verbose",True))
         wd          = str(kwargs.get("workdir","$(pwd)"))
         part        = str(kwargs.get("partition","debug"))
-        log.error("ENV SETTINGS: %s",str(env))
+        #log.error("ENV SETTINGS: %s",str(env))
 
         if cpu == 0.: raise Exception("must provide cpu time")
 

@@ -252,7 +252,8 @@ class RecoRunner(Runner):
         try:
             jobs_in_batch = self.hpc.queryJobs()
         except Exception as err:
-            self.log.error(str(err))
+            self.log.exception("exception in trying to retrieve jobs")
+            raise
         for job,status in jobs_in_batch.iteritems():
             if job in self.jobs.keys():
                 if status in self.hpc.getFinalStatii():

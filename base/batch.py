@@ -95,7 +95,11 @@ class slurm(hpc):
         jobs = {}
         cmd = "squeue -u {user} -o \"%A %t\"".format(user=self.user)
         log.error("**DEBUG** status cmd: %s",cmd)
-        rc, output, error = __run__(cmd)
+        try:
+            rc, output, error = __run__(cmd)
+        except:
+            log.exception("exception trying to run command")
+            raise
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
             log.error(msg)

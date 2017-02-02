@@ -35,7 +35,7 @@ class hpc(object):
     def __submit__(self,cmd,dry=False,verbose=True):
         """ convenience method to wrap batch submission, will return jobID"""
         if verbose:
-            self.log.info("bash: %s",cmd)
+            self.log.critical("bash: %s",cmd)
         if dry:
             self.log.info("running in DRY mode, do not submit anything.")
             return -1
@@ -137,5 +137,4 @@ class slurm(hpc):
                                                                                 env=",".join(env.keys()),
                                                                                 memory=memory, cpu=cpu,
                                                                                 executable=executable)
-        log.info(cmd)
         return self.__submit__(cmd,verbose=verbose,dry=dry)

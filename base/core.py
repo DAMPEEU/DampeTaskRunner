@@ -251,6 +251,7 @@ class RecoRunner(Runner):
         jobs_in_batch = {}
         try:
             jobs_in_batch = self.hpc.queryJobs()
+            self.log.info("jobs submitted by daemon %i",len(jobs_in_batch.keys()))
         except Exception as err:
             self.log.exception("exception in trying to retrieve jobs")
             raise
@@ -301,7 +302,7 @@ class RecoRunner(Runner):
                 if self.dry: continue
             except Exception as err:
                 self.log.error(str(err))
-                continue
+                raise
             self.jobs[jobId]="Q" if self.batch_system == "pbs" else "PD"
             self.log.info("submitted job %s",jobId)
 

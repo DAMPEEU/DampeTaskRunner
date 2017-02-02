@@ -50,8 +50,7 @@ class pbs(hpc):
     def queryJobs(self):
         """ returns a dict of jobs and status """
         jobs = {}
-        usr = getenv("PBS_USER", "user")
-        cmd = "qstat -u {user}".format(user=usr)
+        cmd = "qstat -u {user}".format(user=self.user)
         rc, output, error = __run__(cmd)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
@@ -94,9 +93,8 @@ class slurm(hpc):
     def queryJobs(self):
         """ returns a dict of jobs and status """
         jobs = {}
-        usr = getenv("PBS_USER", "user")
-        cmd = 'squeue -u {user} -o "%A %t" '.format(user=usr)
-        log.info("**DEBUG** status cmd: %s",cmd)
+        cmd = 'squeue -u {user} -o "%A %t" '.format(user=self.user)
+        #log.info("**DEBUG** status cmd: %s",cmd)
         rc, output, error = __run__(cmd)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)

@@ -104,10 +104,10 @@ class slurm(hpc):
         if len(lines) == 1: jobs = {}
         else:
             lines = lines[1:-1]
-            log.critical("%s",str(lines))
             for line in lines[1:-1]:
                 while "\n" in line: line = line.replace("\n","")
                 my_line = line.split()
+                log.error(str(my_line))
                 jobId, status = my_line[0],my_line[3]
                 jobs[int(jobId)] = status
         return jobs

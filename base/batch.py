@@ -53,7 +53,7 @@ class pbs(hpc):
         """ returns a dict of jobs and status """
         jobs = {}
         cmd = "qstat -u {user}".format(user=self.user)
-        rc, output, error = __run__(cmd)
+        rc, output, error = __run__(cmd,shell=True)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
             log.error(msg)
@@ -97,7 +97,7 @@ class slurm(hpc):
         jobs = {}
         cmd = "squeue -u {user} ".format(user=self.user)
         log.error("**DEBUG** status cmd: %s",cmd)
-        rc, output, error = __run__(cmd)
+        rc, output, error = __run__(cmd,shell=True)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
             log.error(msg)

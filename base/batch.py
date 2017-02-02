@@ -4,8 +4,8 @@
 """
 import logging
 from re import findall
-from os import getenv, environ, chmod
-from os.path import abspath
+from os import getenv, environ, chmod, chdir
+from os.path import abspath, basename, dirname
 from base.utils import run as __run__
 from tempfile import NamedTemporaryFile
 
@@ -148,5 +148,6 @@ class slurm(hpc):
         sscript.close()
         sname=abspath(sscript.name)
         chmod(sname,0o755)
-        cmd="{sub} .{fn}".format(sub=self.executor,fn=sname)
+        chdir(dirname(sname))
+        cmd="{sub} ./{fn}".format(sub=self.executor,fn=basename(sname))
         return self.__submit__(cmd,verbose=verbose,dry=dry)

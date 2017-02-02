@@ -100,13 +100,16 @@ class slurm(hpc):
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
             log.error(msg)
             raise Exception(msg)
+        log.critical(output)
         lines = output.split("\n")
         if len(lines) == 1: jobs = {}
         else:
             lines = lines[1:-1]
+            log.critical("%s",str(lines))
             for line in lines[1:-1]:
                 while "\n" in line: line = line.replace("\n","")
                 jobId, status = line.split()
+                log.critical('jobId: %i, status: %s',jobId,status)
                 jobs[int(jobId)] = status
         return jobs
 

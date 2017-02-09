@@ -213,6 +213,7 @@ class RecoRunner(Runner):
         start = datetime.now()
         maxfiles = 1000 # REMOVE AFTER DEBUG!
         for i,f in enumerate(self.files_to_process):
+            if len(files) >= maxfiles: break
             if i != 0 and i%steps == 0:
                 progress+=10
                 self.log.info("progress: %i percent",progress)
@@ -256,7 +257,6 @@ class RecoRunner(Runner):
             if skip: continue
             # file not being present, should process
             self.log.debug("FILE: %s -> %s", infile, outfilesF[0])
-            if len(files) >= maxfiles: break
             files.append((infile, outfilesF[0]))
             self.processed_files.append(fname)
         stop = datetime.now()

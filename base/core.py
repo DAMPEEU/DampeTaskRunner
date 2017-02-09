@@ -208,7 +208,7 @@ class RecoRunner(Runner):
             self.log.info("skipping verification")
         base_dirs = self.task.get("output_root",["/tmp"])
 
-        steps = int(len(self.files_to_process)/10.)
+        steps = int(maxfiles/10.)
         progress = 0
         start = datetime.now()
         #maxfiles = 1000 # REMOVE AFTER DEBUG!

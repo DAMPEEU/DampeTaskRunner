@@ -203,6 +203,8 @@ class RecoRunner(Runner):
         verify = self.task.get("verify_output",False)
         if verify:
             self.log.info("Requested verification of output files prior to submitting jobs")
+        else:
+            self.log.info("skipping verification")
         base_dirs = self.task.get("output_root",["/tmp"])
         for f in self.files_to_process:
             fname = basename(f)
@@ -370,7 +372,11 @@ class RecoRunner(Runner):
             if self.dry: loop = tqdm(loop)
             for f in loop:
                 if f in self.processed_files: continue # skip
-                if isfile(f): self.files_to_process.append(f)
+                if isfile(f):
+                    if f in self.files_to_process:
+                        self.log.debug("file already in list of files to process")
+                        continue
+                    self.files_to_process.append(f)
                 else:
                     self.log.error("could not add %s",f)
             self.log.info("found %i files to process this cycle",len(self.files_to_process))

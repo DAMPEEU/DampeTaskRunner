@@ -52,6 +52,7 @@ class pbs(hpc):
         """ returns a dict of jobs and status """
         jobs = {}
         cmd = "qstat -u {user}".format(user=self.user)
+        log.info(cmd)
         rc, output, error = __run__(cmd,shell=True)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
@@ -106,7 +107,7 @@ class slurm(hpc):
         if len(lines) == 1: jobs = {}
         else:
             lines = lines[1:-1]
-            log.info("DEBUG: %s",str(lines))
+            #log.info("DEBUG: %s",str(lines))
             for line in lines[1:-1]:
                 while "\n" in line: line = line.replace("\n","")
                 my_line = [f for f in line.split(" ") if not f == ""]
@@ -152,5 +153,4 @@ class slurm(hpc):
         chmod(sname,0o755)
         chdir(dirname(sname))
         cmd="{sub} ./{fn}".format(sub=self.executor,fn=basename(sname))
-        log.info(cmd)
         return self.__submit__(cmd,verbose=verbose,dry=dry)

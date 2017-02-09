@@ -211,7 +211,7 @@ class RecoRunner(Runner):
         steps = int(len(self.files_to_process)/10.)
         progress = 0
         start = datetime.now()
-        maxfiles = 1000 # REMOVE AFTER DEBUG!
+        #maxfiles = 1000 # REMOVE AFTER DEBUG!
         for i,f in enumerate(self.files_to_process):
             if len(files) >= maxfiles: break
             if i != 0 and i%steps == 0:
@@ -316,7 +316,7 @@ class RecoRunner(Runner):
 
             jobId = -1
             try:
-                self.dry = True # REMOVE WHEN DONE!
+                #self.dry = True # REMOVE WHEN DONE!
                 self.log.info("submitting chunk %i/%i: ", i + 1, nchunks)
                 jobId = self.hpc.submit(dry=self.dry,verbose=True,workdir=self.workdir,**my_dict)
                 if self.dry: continue

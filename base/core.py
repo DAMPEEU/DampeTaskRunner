@@ -4,7 +4,8 @@ Created on Jan 9, 2017
 @author: zimmer
 '''
 import logging
-from numpy import array, array_split, savetxt
+from numpy import array, array_split, savetxt, arange
+from datetime import datetime
 from tqdm import tqdm
 from random import randint
 from fnmatch import fnmatch
@@ -206,7 +207,14 @@ class RecoRunner(Runner):
         else:
             self.log.info("skipping verification")
         base_dirs = self.task.get("output_root",["/tmp"])
-        for f in self.files_to_process:
+
+        steps = self.files_to_process/10
+        progress = 0
+        start = datetime.now()
+        for i,f in enumerate(self.files_to_process):
+            if i != 0 and i%steps == 0:
+                progress+=10
+                self.log.info("progress: %i percent",progress)
             fname = basename(f)
             if fname in self.processed_files:
                 self.log.debug("file already being processed.")
@@ -250,7 +258,9 @@ class RecoRunner(Runner):
             if len(files) >= maxfiles: break
             files.append((infile, outfilesF[0]))
             self.processed_files.append(fname)
-
+        stop = datetime.now()
+        dt = (stop - start).total_seconds()/60.
+        self.log.info("finished assembling list of processed files (took %i minutes to complete.)",int(dt))
         # query the job status
         jobs_in_batch = {}
         try:

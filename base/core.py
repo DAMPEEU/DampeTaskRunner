@@ -211,6 +211,7 @@ class RecoRunner(Runner):
         steps = int(len(self.files_to_process)/10.)
         progress = 0
         start = datetime.now()
+        maxfiles = 1000 # REMOVE AFTER DEBUG!
         for i,f in enumerate(self.files_to_process):
             if i != 0 and i%steps == 0:
                 progress+=10

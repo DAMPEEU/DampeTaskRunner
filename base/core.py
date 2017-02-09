@@ -376,21 +376,25 @@ class RecoRunner(Runner):
                     self.log.info("adding %i files to processing list",len(files_to_add))
                     files_to_process += files_to_add
 
-        if len(files_to_process):
-            self.log.info("check input files")
-            loop = files_to_process
-            if self.dry: loop = tqdm(loop)
-            for f in loop:
-                if f in self.processed_files: continue # skip
-                if isfile(f):
-                    if f in self.files_to_process:
-                        self.log.debug("file already in list of files to process")
-                        continue
-                    self.files_to_process.append(f)
-                else:
-                    self.log.error("could not add %s",f)
-            self.log.info("found %i files to process this cycle",len(self.files_to_process))
+#  < < SUBJECT FOR REMOVAL > >
+#        if len(files_to_process):
+#            self.log.info("check input files")
+#            loop = files_to_process
+#            if self.dry: loop = tqdm(loop)
+#            for f in loop:
+#                if f in self.processed_files: continue # skip
+#                if isfile(f):
+#                    if f in self.files_to_process:
+#                        self.log.debug("file already in list of files to process")
+#                        continue
+#                    self.files_to_process.append(f)
+#                else:
+#                    self.log.error("could not add %s",f)
+#            self.log.info("found %i files to process this cycle",len(self.files_to_process))
 
+        if len(files_to_process):
+            self.log.info("check for duplicates in input")
+            self.files_to_process = list(set(files_to_process))
 
 def parse_config(cfg):
     config = yload(open(abspath(cfg)))

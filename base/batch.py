@@ -89,7 +89,7 @@ class pbs(hpc):
         return self.__submit__(cmd,verbose=verbose,dry=dry)
 
 class slurm(hpc):
-    final_statii = ["CA","F","TO","CD","SE"]
+    final_statii = ["PD","R","C"]
     executor = "sbatch"
     def queryJobs(self):
         """ returns a dict of jobs and status """

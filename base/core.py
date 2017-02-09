@@ -270,6 +270,7 @@ class RecoRunner(Runner):
         except Exception as err:
             self.log.exception("exception in trying to retrieve jobs")
             raise
+        self.log.info("finished querying Batch system")
         for job,status in jobs_in_batch.iteritems():
             if job in self.jobs.keys():
                 if status in self.hpc.getFinalStatii():
@@ -280,11 +281,11 @@ class RecoRunner(Runner):
         if not len(files):
             self.log.info("found no files to submit this cycle, return")
             return
-
+        self.log.info("submitting %i files this cycle",len(files))
         memory= self.batch.get("mem","100Mb")
 
         chunks = array_split(array(files),nchunks)
-
+        self.log.info("preparing %i chunks this cycle",len(chunks))
         for i,chunk in enumerate(chunks):
             #self.log.debug(dict(chunk.tolist()))
             tf = NamedTemporaryFile(dir=self.workdir,delete=False)

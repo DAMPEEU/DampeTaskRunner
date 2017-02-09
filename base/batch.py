@@ -9,7 +9,7 @@ from os.path import abspath, basename, dirname
 from base.utils import run as __run__
 from tempfile import NamedTemporaryFile
 
-log = logging.getLogger("core")
+log = logging.getLogger("RecoRunner")
 
 class hpc(object):
     user = None

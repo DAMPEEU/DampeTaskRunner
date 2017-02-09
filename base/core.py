@@ -201,7 +201,8 @@ class RecoRunner(Runner):
 
         files = []
         verify = self.task.get("verify_output",False)
-        self.log.info("Requested verification of output files prior to submitting jobs")
+        if verify:
+            self.log.info("Requested verification of output files prior to submitting jobs")
         base_dirs = self.task.get("output_root",["/tmp"])
         for f in self.files_to_process:
             fname = basename(f)

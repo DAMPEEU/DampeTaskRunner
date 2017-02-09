@@ -97,7 +97,7 @@ class slurm(hpc):
         cmd = '/bin/env squeue -u {user} -t "{statii}"'.format(user=self.user,statii=",".join(self.final_statii))
         log.info(cmd)
         #log.error("**DEBUG** status cmd: %s",cmd)
-        rc, output, error = __run__(cmd,shell=True)
+        rc, output, error = __run__(cmd,shell=False)
         if rc:
             msg = "error, RC=%i, error msg follows \n %s" % (rc, error)
             log.error(msg)

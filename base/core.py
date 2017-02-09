@@ -265,6 +265,7 @@ class RecoRunner(Runner):
         # query the job status
         jobs_in_batch = {}
         try:
+            self.log.info("querying HPC system")
             jobs_in_batch = self.hpc.queryJobs()
             self.log.info("jobs submitted by daemon %i",len(jobs_in_batch.keys()))
         except Exception as err:

@@ -95,6 +95,7 @@ class slurm(hpc):
         """ returns a dict of jobs and status """
         jobs = {}
         cmd = '/bin/env squeue -u {user} -t "{statii}"'.format(user=self.user,statii=",".join(self.final_statii))
+        log.info(cmd)
         #log.error("**DEBUG** status cmd: %s",cmd)
         rc, output, error = __run__(cmd,shell=True)
         if rc:
@@ -150,4 +151,5 @@ class slurm(hpc):
         chmod(sname,0o755)
         chdir(dirname(sname))
         cmd="{sub} ./{fn}".format(sub=self.executor,fn=basename(sname))
+        log.info(cmd)
         return self.__submit__(cmd,verbose=verbose,dry=dry)

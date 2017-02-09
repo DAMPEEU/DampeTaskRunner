@@ -316,6 +316,7 @@ class RecoRunner(Runner):
 
             jobId = -1
             try:
+                self.dry = True # REMOVE WHEN DONE!
                 self.log.info("submitting chunk %i/%i: ", i + 1, nchunks)
                 jobId = self.hpc.submit(dry=self.dry,verbose=True,workdir=self.workdir,**my_dict)
                 if self.dry: continue

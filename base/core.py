@@ -214,6 +214,7 @@ class RecoRunner(Runner):
         #maxfiles = 1000 # REMOVE AFTER DEBUG!
         for i,f in enumerate(self.files_to_process):
             if len(files) >= maxfiles: break
+            if progress >= 100: break
             if i != 0 and i%steps == 0:
                 progress+=10
                 self.log.info("progress: %i percent",progress)

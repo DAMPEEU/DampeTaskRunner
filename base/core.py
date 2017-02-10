@@ -48,6 +48,7 @@ class Runner(object):
         self.config = config
         self.initialize()
         self.workdir = None
+        self.continue_cycle = True
 
     def setWorkDir(self,wd):
         if isdir(wd):
@@ -137,6 +138,8 @@ class Runner(object):
     def execute(self):
         """ this one executes stuff """
         while self.cycle < self.cycles:
+            if not self.continue_cycle:
+                break
             self.log.info("entering cycle %i/%i", self.cycle, self.cycles)
             self.getProxy()
             self.initCycle()
@@ -282,6 +285,7 @@ class RecoRunner(Runner):
 
         if not len(files):
             self.log.info("found no files to submit this cycle, return")
+            self.continue_cycle = False
             return
         self.log.info("submitting %i files this cycle",len(files))
         memory= self.batch.get("mem","100Mb")

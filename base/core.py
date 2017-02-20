@@ -219,6 +219,7 @@ class RecoRunner(Runner):
         skipped_files = []
         files_already_processed = []
         files_already_there = []
+        nfiles_added = 0
         for i,f in enumerate(self.files_to_process):
             if len(files) >= maxfiles:
                 self.log.info("reached maximum number of files to process this cycle: %i",len(files))
@@ -226,9 +227,12 @@ class RecoRunner(Runner):
             #if progress > 100:
             #    self.log.info("reached 100% progress bar (#files: %i).",len(files))
             #    break
-            if i != 0 and i%steps == 0:
-                progress+=10
-                self.log.info("progress: %i percent",progress)
+            if nfiles_added >= steps:
+                progress += 10
+                self.log.info("progress: %i percent", progress)
+                nfiles_added = 0
+            #if i != 0 and i%steps == 0:
+
             fname = basename(f)
             if fname in self.processed_files:
                 self.log.debug("file already being processed.")
@@ -275,6 +279,7 @@ class RecoRunner(Runner):
                 self.log.debug("FILE: %s -> %s", infile, outfilesF[0])
                 files.append((infile, outfilesF[0]))
                 self.processed_files.append(fname)
+                nfiles_added+=1
         stop = datetime.now()
         dt = (stop - start).total_seconds()/60.
         self.log.info("finished assembling list of %i processed files (took %i minutes to complete.)",len(files),int(dt))

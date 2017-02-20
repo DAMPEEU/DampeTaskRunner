@@ -176,7 +176,7 @@ class RecoRunner(Runner):
         nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
         nfiles  = self.task.get("max_files_per_job",10)
         maxfiles = nfiles * nchunks
-        self.log.debug("#chunks %i | #files %i | #total files %i",nchunks, nfiles, maxfiles)
+        self.log.info("#chunks %i | #files %i | #total files %i",nchunks, nfiles, maxfiles)
 
 
         def infile2outfile(infile,target='xrootd',method='simu:reco'):
@@ -216,7 +216,9 @@ class RecoRunner(Runner):
         start = datetime.now()
         #maxfiles = 1000 # REMOVE AFTER DEBUG!
         for i,f in enumerate(self.files_to_process):
-            if len(files) >= maxfiles: break
+            if len(files) >= maxfiles:
+                self.log.info("reached maximum number of files to process: %i",len(files))
+                break
             if progress >= 100: break
             if i != 0 and i%steps == 0:
                 progress+=10

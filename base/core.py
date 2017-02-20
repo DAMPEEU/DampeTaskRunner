@@ -214,7 +214,6 @@ class RecoRunner(Runner):
         steps = int(maxfiles/10.)
         progress = 0
         start = datetime.now()
-        #maxfiles = 1000 # REMOVE AFTER DEBUG!
         self.log.info("processing %i files this cycle",len(self.files_to_process))
         skipped_files = []
         files_already_processed = []
@@ -224,15 +223,10 @@ class RecoRunner(Runner):
             if len(files) >= maxfiles:
                 self.log.info("reached maximum number of files to process this cycle: %i",len(files))
                 break
-            #if progress > 100:
-            #    self.log.info("reached 100% progress bar (#files: %i).",len(files))
-            #    break
             if nfiles_added >= steps:
                 progress += 10
                 self.log.info("progress: %i percent", progress)
                 nfiles_added = 0
-            #if i != 0 and i%steps == 0:
-
             fname = basename(f)
             if fname in self.processed_files:
                 self.log.debug("file already being processed.")
@@ -251,14 +245,11 @@ class RecoRunner(Runner):
                     base_dir = base_dir.replace("@XROOTD:BASEDIR", self.__get_xrd_base__())
                     target = 'xrootd'
                 outfile = infile2outfile(infile,target=target)
-                #print outfile
-                #print 'after call: in2out ',base_dir, outfile
                 if target == 'local':
                     outfile = "".join([base_dir,outfile])
                     while "//" in outfile:
                         outfile = outfile.replace("//","/")
                 outfilesF.append(outfile)
-                #print 'before check',base_dir, outfile
                 if isfile(outfile):
                     self.log.debug("found %s already",outfile)
                     if verify:

@@ -265,7 +265,8 @@ class RecoRunner(Runner):
             self.processed_files.append(fname)
         stop = datetime.now()
         dt = (stop - start).total_seconds()/60.
-        self.log.info("finished assembling list of processed files (took %i minutes to complete.)",int(dt))
+        self.log.info("finished assembling list of %i processed files (took %i minutes to complete.)",len(files),int(dt))
+
         # query the job status
         jobs_in_batch = {}
         try:
@@ -323,7 +324,7 @@ class RecoRunner(Runner):
             try:
                 #self.dry = True # REMOVE WHEN DONE!
                 self.log.info("submitting chunk %i/%i: ", i + 1, nchunks)
-                jobId = self.hpc.submit(dry=self.dry,verbose=True,workdir=self.workdir,**my_dict)
+                jobId = self.hpc.submit(dry=self.dry,verbose=False,workdir=self.workdir,**my_dict)
                 if self.dry: continue
             except Exception as err:
                 self.log.error(str(err))

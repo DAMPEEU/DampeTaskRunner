@@ -33,7 +33,7 @@ class hpc(object):
     def setUser(self,usr):
         self.user = usr
 
-    def __submit__(self,cmd,dry=False,verbose=True):
+    def __submit__(self,cmd,dry=False,verbose=False):
         """ convenience method to wrap batch submission, will return jobID"""
         if verbose:
             log.info("bash: %s",cmd)

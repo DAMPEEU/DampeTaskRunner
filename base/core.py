@@ -215,11 +215,14 @@ class RecoRunner(Runner):
         progress = 0
         start = datetime.now()
         #maxfiles = 1000 # REMOVE AFTER DEBUG!
+        self.log.info("processing %i files this cycle",len(self.files_to_process))
         for i,f in enumerate(self.files_to_process):
             if len(files) >= maxfiles:
                 self.log.info("reached maximum number of files to process: %i",len(files))
                 break
-            if progress >= 100: break
+            if progress >= 100:
+                self.log.info("reached 100% progress bar (#files: %i).",len(files))
+                break
             if i != 0 and i%steps == 0:
                 progress+=10
                 self.log.info("progress: %i percent",progress)

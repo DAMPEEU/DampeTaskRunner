@@ -234,7 +234,7 @@ class RecoRunner(Runner):
                 self.log.debug("file already being processed.")
                 skipped_files.append(fname)
                 files_already_processed.append(fname)
-                continue
+                skip = True
             infile = f
             skip = False
             outfilesF = []
@@ -270,11 +270,11 @@ class RecoRunner(Runner):
             if skip:
                 skipped_files.append(fname)
                 files_already_there.append(fname)
-                continue
-            # file not being present, should process
-            self.log.debug("FILE: %s -> %s", infile, outfilesF[0])
-            files.append((infile, outfilesF[0]))
-            self.processed_files.append(fname)
+            else:
+                # file not being present, should process
+                self.log.debug("FILE: %s -> %s", infile, outfilesF[0])
+                files.append((infile, outfilesF[0]))
+                self.processed_files.append(fname)
         stop = datetime.now()
         dt = (stop - start).total_seconds()/60.
         self.log.info("finished assembling list of %i processed files (took %i minutes to complete.)",len(files),int(dt))

@@ -217,6 +217,7 @@ class RecoRunner(Runner):
         #maxfiles = 1000 # REMOVE AFTER DEBUG!
         self.log.info("processing %i files this cycle",len(self.files_to_process))
         skipped_files = []
+        files_already_processed = []
         files_already_there = []
         for i,f in enumerate(self.files_to_process):
             if len(files) >= maxfiles:
@@ -232,7 +233,7 @@ class RecoRunner(Runner):
             if fname in self.processed_files:
                 self.log.debug("file already being processed.")
                 skipped_files.append(fname)
-                files_already_there.append(fname)
+                files_already_processed.append(fname)
                 continue
             infile = f
             skip = False
@@ -269,6 +270,7 @@ class RecoRunner(Runner):
                         break
             if skip:
                 skipped_files.append(fname)
+                files_already_there.append(fname)
                 continue
             # file not being present, should process
             self.log.debug("FILE: %s -> %s", infile, outfilesF[0])
@@ -277,7 +279,8 @@ class RecoRunner(Runner):
         stop = datetime.now()
         dt = (stop - start).total_seconds()/60.
         self.log.info("finished assembling list of %i processed files (took %i minutes to complete.)",len(files),int(dt))
-        self.log.info("skipped %i files, %i of which are already on xrootd",len(skipped_files),len(files_already_there))
+        self.log.info("skipped %i files, %i of which are already on xrootd, %i already processed",len(skipped_files),
+                        len(files_already_there),len(files_already_processed))
 
         # query the job status
         jobs_in_batch = {}

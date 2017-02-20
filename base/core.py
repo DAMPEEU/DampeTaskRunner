@@ -222,10 +222,12 @@ class RecoRunner(Runner):
         for i,f in enumerate(self.files_to_process):
             if len(files) >= maxfiles:
                 self.log.info("reached maximum number of files to process this cycle: %i",len(files))
-                break
+                skip = True
+                #break
             if progress >= 100:
                 self.log.info("reached 100% progress bar (#files: %i).",len(files))
-                break
+                skip = True
+                #break
             if i != 0 and i%steps == 0:
                 progress+=10
                 self.log.info("progress: %i percent",progress)

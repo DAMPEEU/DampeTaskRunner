@@ -221,7 +221,7 @@ class RecoRunner(Runner):
         files_already_there = []
         for i,f in enumerate(self.files_to_process):
             if len(files) >= maxfiles:
-                self.log.info("reached maximum number of files to process: %i",len(files))
+                self.log.info("reached maximum number of files to process this cycle: %i",len(files))
                 break
             if progress >= 100:
                 self.log.info("reached 100% progress bar (#files: %i).",len(files))
@@ -239,6 +239,7 @@ class RecoRunner(Runner):
             skip = False
             outfilesF = []
             for base_dir in base_dirs:
+                if skip: continue
                 base_dir
                 self.log.debug("using basedir: %s",base_dir)
                 target = 'local'
@@ -260,14 +261,12 @@ class RecoRunner(Runner):
                         if verifyDampeMC(outfile):
                             self.log.debug("verification of ROOT file successful, skipping")
                             skip = True
-                            break
                         else:
                             self.log.debug("verification of ROOT file failed")
                             continue # move on to 2nd method.
                     else:
                         self.log.debug("skipping verification, skipping file.")
                         skip = True
-                        break
             if skip:
                 skipped_files.append(fname)
                 files_already_there.append(fname)

@@ -221,6 +221,7 @@ class RecoRunner(Runner):
         files_already_there = []
         nfiles_added = 0
         for i,f in enumerate(self.files_to_process):
+            skip = False
             if len(files) >= maxfiles:
                 self.log.info("progress: 100 percent - reached maximum number of files to process this cycle: %i",len(files))
                 break
@@ -235,7 +236,6 @@ class RecoRunner(Runner):
                 files_already_processed.append(fname)
                 skip = True
             infile = f
-            skip = False
             outfilesF = []
             for base_dir in base_dirs:
                 if skip: continue

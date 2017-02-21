@@ -142,7 +142,7 @@ class Runner(object):
                 break
             self.log.info("entering cycle %i/%i", self.cycle, self.cycles)
             self.getProxy()
-            self.initCycle()
+            self.initCycle(addFiles=True if self.cycle == 0 else False)
             self.runCycle()
             if self.cycle > 1: self.flush()
             self.sleep()
@@ -212,6 +212,7 @@ class RecoRunner(Runner):
         base_dirs = self.task.get("output_root",["/tmp"])
 
         steps = int(maxfiles/10.)
+        files_per_chunk = maxfiles / nchunks
         progress = 0
         start = datetime.now()
         self.log.info("processing %i files this cycle",len(self.files_to_process))
@@ -221,7 +222,7 @@ class RecoRunner(Runner):
         nfiles_added = 0
         for i,f in enumerate(self.files_to_process):
             if len(files) >= maxfiles:
-                self.log.info("reached maximum number of files to process this cycle: %i",len(files))
+                self.log.info("progress: 100 percent - reached maximum number of files to process this cycle: %i",len(files))
                 break
             if nfiles_added >= steps:
                 progress += 10
@@ -342,7 +343,7 @@ class RecoRunner(Runner):
             self.jobs[jobId]="Q" if self.batch_system == "pbs" else "PD"
             self.log.info("submitted job %s",jobId)
 
-    def initCycle(self):
+    def initCycle(self,addFiles=True):
         """ initialize each cycle """
         wd = self.task.get("workdir","/tmp/runner")
         wd = opjoin(wd,"cycle_{i}".format(i=self.cycle+1))
@@ -376,25 +377,26 @@ class RecoRunner(Runner):
                 return
             else:
                 tasks = []
-                for p in pattern:
-                    tasks += [opjoin(folders.parent,entry.name) for entry in folders.dirlist if fnmatch(entry.name,p)]
-                self.log.info("found %i tasks, querying for files.",len(tasks))
-                loop = enumerate(tasks)
-                if self.dry: loop = tqdm(loop)
-                for i, task in loop:
-                    self.log.info("%i/%i: working on task: %s",i+1,len(tasks),task)
-                    is_ok, folders = xc.dirlist(task)
-                    if not is_ok.ok:
-                        self.log.error(is_ok.message)
-                        continue
-                    files_to_add = []
-                    for entry in folders.dirlist:
-                        self.log.debug(str(entry))
-                        lfn_name = lfn(folders.parent, entry.name, xc=xc)
-                        self.log.debug(lfn_name)
-                        if fnmatch(lfn_name,"*.root"): files_to_add.append(lfn_name)
-                    self.log.info("adding %i files to processing list",len(files_to_add))
-                    files_to_process += files_to_add
+                if addFiles:
+                    for p in pattern:
+                        tasks += [opjoin(folders.parent,entry.name) for entry in folders.dirlist if fnmatch(entry.name,p)]
+                    self.log.info("found %i tasks, querying for files.",len(tasks))
+                    loop = enumerate(tasks)
+                    if self.dry: loop = tqdm(loop)
+                    for i, task in loop:
+                        self.log.info("%i/%i: working on task: %s",i+1,len(tasks),task)
+                        is_ok, folders = xc.dirlist(task)
+                        if not is_ok.ok:
+                            self.log.error(is_ok.message)
+                            continue
+                        files_to_add = []
+                        for entry in folders.dirlist:
+                            self.log.debug(str(entry))
+                            lfn_name = lfn(folders.parent, entry.name, xc=xc)
+                            self.log.debug(lfn_name)
+                            if fnmatch(lfn_name,"*.root"): files_to_add.append(lfn_name)
+                        self.log.info("adding %i files to processing list",len(files_to_add))
+                        files_to_process += files_to_add
 
 #  < < SUBJECT FOR REMOVAL > >
 #        if len(files_to_process):

@@ -188,9 +188,10 @@ class RecoRunner(Runner):
                     del self.jobs[job]
                 else:
                     self.jobs[job]=status
-        if not len(jobs_in_batch):
-            self.log.info("found no more running jobs, flushing memory.")
-            self.jobs = {}
+        if self.cycle > 0:
+            if not len(jobs_in_batch):
+                self.log.info("found no more running jobs, flushing memory.")
+                self.jobs = {}
 
         nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
         if not nchunks:

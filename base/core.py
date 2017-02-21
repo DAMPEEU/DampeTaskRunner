@@ -173,6 +173,22 @@ class RecoRunner(Runner):
         """ run in each cycle """
         chdir(self.workdir)
         # next, split list into chunks.
+        jobs_in_batch = {}
+        try:
+            self.log.info("querying HPC system")
+            jobs_in_batch = self.hpc.queryJobs()
+            self.log.info("jobs currently in system %i",len(jobs_in_batch.keys()))
+        except Exception as err:
+            self.log.exception("exception in trying to retrieve jobs")
+            raise
+        self.log.info("finished querying Batch system")
+        for job,status in jobs_in_batch.iteritems():
+            if job in self.jobs.keys():
+                if status in self.hpc.getFinalStatii():
+                    del self.jobs[job]
+                else:
+                    self.jobs[job]=status
+
         nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
         if not nchunks:
             self.log.info("all available slots are occupied, do nothing.")
@@ -280,23 +296,6 @@ class RecoRunner(Runner):
         self.log.info("finished assembling list of %i processed files (took %i minutes to complete.)",len(files),int(dt))
         self.log.info("skipped %i files, %i of which are already on xrootd, %i already processed",len(skipped_files),
                         len(files_already_there),len(files_already_processed))
-
-        # query the job status
-        jobs_in_batch = {}
-        try:
-            self.log.info("querying HPC system")
-            jobs_in_batch = self.hpc.queryJobs()
-            self.log.info("jobs submitted by daemon %i",len(jobs_in_batch.keys()))
-        except Exception as err:
-            self.log.exception("exception in trying to retrieve jobs")
-            raise
-        self.log.info("finished querying Batch system")
-        for job,status in jobs_in_batch.iteritems():
-            if job in self.jobs.keys():
-                if status in self.hpc.getFinalStatii():
-                    del self.jobs[job]
-                else:
-                    self.jobs[job]=status
 
         if not len(files):
             self.log.info("found no files to submit this cycle, return")

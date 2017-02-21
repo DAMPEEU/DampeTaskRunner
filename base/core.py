@@ -194,11 +194,11 @@ class RecoRunner(Runner):
                 self.jobs = {}
 
         nchunks = self.batch.get("max_jobs",10) - len(self.jobs.keys())
-        if not nchunks:
-            self.log.info("all available slots are occupied, do nothing.")
-            return
         nfiles  = self.task.get("max_files_per_job",10)
         maxfiles = nfiles * nchunks
+        if not maxfiles:
+            self.log.info("all available slots are occupied, do nothing.")
+            return
         self.log.info("#chunks %i | #files %i | #total files %i",nchunks, nfiles, maxfiles)
 
 
